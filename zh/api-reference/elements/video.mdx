@@ -1,0 +1,46 @@
+---
+title: "Video"
+---
+
+`Video` 类允许你在聊天机器人用户界面中为特定视频文件显示视频播放器。
+
+你必须提供 `url`、`path` 或 `content` 字节中的至少一项。
+
+## 属性
+
+<ParamField path="name" type="str">
+  要在 UI 中显示的视频文件名称。此名称会展示给用户。
+</ParamField>
+
+<ParamField path="display" type="ElementDisplay" optional>
+  决定元素在 UI 中的显示位置。可选值为 "side"（默认）、"inline" 或 "page"。
+</ParamField>
+
+<ParamField path="url" type="str" optional>
+  视频的远程 URL。
+</ParamField>
+
+<ParamField path="path" type="str" optional>
+  视频的本地文件路径。
+</ParamField>
+
+<ParamField path="content" type="bytes" optional>
+  视频的文件内容（字节格式）。
+</ParamField>
+
+## 示例
+
+```python
+import chainlit as cl
+
+
+@cl.on_chat_start
+async def main():
+    elements = [
+        cl.Video(name="example.mp4", path="./example.mp4", display="inline"),
+    ]
+    await cl.Message(
+        content="这是一个视频文件",
+        elements=elements,
+    ).send()
+```

@@ -1,0 +1,76 @@
+---
+title: "多模态"
+---
+
+「多模态」指支持文本以外的内容，包括图像、视频、音频和文件。
+
+## 语音助手
+
+Chainlit 允许你访问用户的麦克风流并实时处理。可用于创建语音助手、转录音频，甚至实时处理音频。
+
+<Note>
+  只有在你实现了
+  [@cl.on_audio_chunk](/api-reference/lifecycle-hooks/on-audio-chunk) 装饰器时，用户才能使用麦克风。
+</Note>
+
+<CardGroup cols={2}>
+  <Card
+    title="OpenAI Realtime"
+    icon="microphone-lines"
+    color="#0285c7"
+    href="https://github.com/Chainlit/cookbook/tree/main/realtime-assistant"
+  >
+    Cookbook 示例，展示如何将 Chainlit 与实时音频 API 配合使用。
+  </Card>
+  <Card
+    title="Text To Speech -> Speech to Text"
+    color="F80061"
+    icon="microphone"
+    href="https://github.com/Chainlit/cookbook/blob/main/openai-whisper/app.py"
+  >
+    Cookbook 示例，展示语音转文字 -> 生成回答 -> 文字转语音。
+  </Card>
+</CardGroup>
+
+<Frame caption="OpenAI Realtime 示例">
+  <video
+    controls
+    loop
+    src="/images/openai-realtime.mp4"
+  />
+</Frame>
+
+## 自发文件上传
+
+在 Chainlit 应用中，用户可以将任意文件附加到消息中。可通过拖放，或点击聊天栏中的 `attach` 按钮实现。
+
+<Frame caption="向消息附加文件">
+  <img src="/images/multi-modal.gif" />
+</Frame>
+
+作为开发者，你可以通过 [@cl.on_message](/api-reference/lifecycle-hooks/on-message) 装饰的函数访问这些附加文件。
+
+```py
+import chainlit as cl
+
+
+@cl.on_message
+async def on_message(msg: cl.Message):
+    if not msg.elements:
+        await cl.Message(content="未附加文件").send()
+        return
+
+    # 仅处理图像
+    images = [file for file in msg.elements if "image" in file.mime]
+
+    # 读取第一张图像
+    with open(images[0].path, "r") as f:
+        pass
+
+    await cl.Message(content=f"已收到 {len(images)} 张图像").send()
+
+```
+
+### 禁用自发文件上传
+
+若要禁用此功能（阻止用户向消息附加文件），可在 Chainlit [配置](/backend/config/features) 文件中设置 `features.spontaneous_file_upload.enabled=false`。

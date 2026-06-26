@@ -1,0 +1,76 @@
+---
+title: "AskFileMessage"
+---
+
+在继续执行之前请求用户上传文件。
+如果用户未在指定时间内作答（见 `timeout`），将根据 `raise_on_timeout` 的设置抛出 `TimeoutError` 或返回 `None`。
+如果配置了项目 ID，消息将上传到云存储。
+
+### 属性
+
+<ParamField path="content" type="str">
+  显示在上传按钮上方的文本。
+</ParamField>
+<ParamField path="accept" type="Union[List[str], Dict[str, List[str]]]">
+  接受的 MIME 类型列表，例如 `["text/csv", "application/pdf"]`，或字典形式，例如 `{"text/plain": [".txt", ".py"]}`。
+  更多信息请参阅 https://react-dropzone.org/#!/Accepting%20specific%20file%20types。
+</ParamField>
+<ParamField path="max_size_mb" type="int" optional>
+  最大文件大小（MB）。默认为 2。
+</ParamField>
+<ParamField path="max_files" type="int" optional>
+  最多可上传的文件数量。默认为 1，最大值为 10。
+</ParamField>
+<ParamField path="author" type="str" optional default="config.ui.name">
+  消息作者，默认为你在配置中定义的聊天机器人名称。
+</ParamField>
+<ParamField path="timeout" type="int" optional default={90}>
+  等待用户作答的秒数，超时后将抛出 TimeoutError。
+</ParamField>
+<ParamField path="raise_on_timeout" type="bool" optional default={false}>
+  若用户未在指定时间内作答，是否抛出 socketio TimeoutError。
+</ParamField>
+
+### 返回值
+
+<ResponseField name="response" type="List[AskFileResponse] | None">
+  用户上传的文件。
+</ResponseField>
+
+### 示例
+
+```python Ask for a text file
+import chainlit as cl
+
+
+@cl.on_chat_start
+async def start():
+    files = None
+
+    # 等待用户上传文件
+    while files == None:
+        files = await cl.AskFileMessage(
+            content="请上传一个文本文件以开始！", accept=["text/plain"]
+        ).send()
+
+    text_file = files[0]
+
+    with open(text_file.path, "r", encoding="utf-8") as f:
+        text = f.read()
+
+    # 告知用户系统已就绪
+    await cl.Message(
+        content=f"已上传 `{text_file.name}`，共包含 {len(text)} 个字符！"
+    ).send()
+
+```
+
+你也可以向 `accept` 参数传入字典，为每种 MIME 类型指定文件扩展名：
+
+```python Ask for a python file
+import chainlit as cl
+
+file = await cl.AskFileMessage(
+        content="请上传一个 Python 文件以开始！", accept={"text/plain": [".py"]}
+      ).send()
+```

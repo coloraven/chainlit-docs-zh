@@ -1,0 +1,62 @@
+---
+title: "Slider"
+---
+
+### 属性
+
+<ParamField path="id" type="str">
+  用于从设置中检索控件值的标识符。
+</ParamField>
+
+<ParamField path="label" type="str">
+  输入控件的标签。
+</ParamField>
+
+<ParamField path="initial" type="int">
+  输入控件的初始值。
+</ParamField>
+
+<ParamField path="min" type="int" optional>
+  允许的最小滑块值。默认为 0。
+</ParamField>
+
+<ParamField path="max" type="int" optional>
+  允许的最大滑块值。默认为 10。
+</ParamField>
+
+<ParamField path="step" type="int" optional>
+  滑块的步进间隔。默认为 1。
+</ParamField>
+
+<ParamField path="tooltip" type="str" optional>
+  悬停在标签旁工具提示图标上时显示的工具提示文本。
+</ParamField>
+
+<ParamField path="description" type="str" optional>
+  显示在输入控件下方的文本。
+</ParamField>
+
+### 用法
+
+```python Code Example
+import chainlit as cl
+from chainlit.input_widget import Slider
+
+
+@cl.on_chat_start
+async def start():
+    settings = await cl.ChatSettings(
+        [
+            Slider(
+                id="Temperature",
+                label="OpenAI - 温度",
+                initial=1,
+                min=0,
+                max=2,
+                step=0.1,
+            ),
+        ]
+    ).send()
+    value = settings["Temperature"]
+
+```

@@ -1,0 +1,81 @@
+---
+title: Web 应用
+---
+
+原生 Chainlit UI，在 8000 端口可用。运行 `chainlit run` 时应在默认浏览器中打开。
+
+## 支持的功能
+
+| 消息 | 流式 | 元素 | 音频 | 询问用户 | 聊天历史 | 聊天配置 | 反馈 |
+| ------- | --------- | -------- | ----- | -------- | ------------ | ------------- | -------- |
+| ✅      | ✅        | ✅       | ✅    | ✅       | ✅           | ✅            | ✅       |
+
+<Frame caption="预览">
+  <img src="/images/starters.gif" />
+</Frame>
+
+## URL 参数
+
+Chainlit Web 应用支持以下 URL 查询参数：
+
+| 参数 | 描述 |
+| --------- | ----------- |
+| `prompt` | 使用给定文本预填聊天输入框。用户可以在发送前编辑或清除。 |
+
+**示例** — 打开聊天并预填消息：
+
+```
+https://your-app.com/?prompt=Hello%20World
+```
+
+这对于创建指向特定对话的深度链接很有用，例如从帮助小组件或邮件营销活动中链接。
+
+<Note>
+  自版本 **2.9.1** 起。
+</Note>
+
+## 窗口消息
+
+在 iframe 中运行 Web 应用时，服务器和父窗口可以使用窗口消息进行通信。这对于向 Chainlit 服务器发送上下文信息，以及根据服务器响应更新父窗口非常有用。
+
+在你的 Chainlit 服务器中添加 `@cl.on_window_message` 装饰的函数，以接收来自父窗口的消息。
+
+```py
+import chainlit as cl
+
+@cl.on_window_message
+async def window_message(message: str):
+  if message.startswith("Client: "):
+    await cl.Message(content=f"收到窗口消息：{message}").send()
+```
+
+然后，在你的应用/网站中，可以像这样发送窗口消息：
+
+```js
+const iframe = document.getElementById('the-iframe');
+iframe.contentWindow.postMessage('Client: 来自父窗口的问候', '*');
+```
+
+要从服务器向父窗口发送消息，请使用 `cl.send_window_message`：
+
+```py
+import chainlit as cl
+
+@cl.on_message
+async def message():
+  await cl.send_window_message("Server: 来自 Chainlit 的问候")
+```
+
+父窗口可以像这样监听消息：
+
+```js
+window.addEventListener('message', (event) => {
+  if (event.data.startsWith("Server: ")) {
+    console.log('父窗口收到：', event.data);
+  }
+});
+```
+
+### 示例
+
+查看 cookbook 中使用窗口消息功能的此示例：https://github.com/Chainlit/cookbook/tree/main/window-message

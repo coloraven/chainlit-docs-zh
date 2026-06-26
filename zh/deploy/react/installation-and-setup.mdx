@@ -1,0 +1,35 @@
+## 概览
+
+`@chainlit/react-client` 包提供一组 React hooks 以及 API 客户端，用于从任意 React 应用连接到你的 **Chainlit** 应用。该包包含用于管理[聊天会话](/concepts/chat-lifecycle)、[消息](/concepts/message)、数据和交互的 hooks。
+
+## 安装
+
+要安装该包，请在项目目录中运行以下命令：
+
+```bash
+npm install @chainlit/react-client
+```
+
+此包使用 **Recoil** 管理状态。这意味着你需要将应用包裹在 recoil provider 中：
+
+```typescript
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { RecoilRoot } from 'recoil';
+
+import { ChainlitAPI, ChainlitContext } from '@chainlit/react-client';
+
+const CHAINLIT_SERVER_URL = 'http://localhost:8000';
+
+const apiClient = new ChainlitAPI(CHAINLIT_SERVER_URL, 'webapp');
+
+ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+  <React.StrictMode>
+    <ChainlitContext.Provider value={apiClient}>
+      <RecoilRoot>
+        <MyApp />
+      </RecoilRoot>
+    </ChainlitContext.Provider>
+  </React.StrictMode>
+);
+```

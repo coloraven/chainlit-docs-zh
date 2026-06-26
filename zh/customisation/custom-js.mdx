@@ -1,0 +1,14 @@
+---
+title: JS
+---
+
+你可以通过向 `config.toml` 添加以下内容，向应用注入自定义 JavaScript 脚本：
+
+```toml config.toml
+[UI]
+# ...
+# 可以是 public 目录中的 css 文件或 URL
+custom_js = '/public/my_js_script.js'
+```
+
+配置更新后，重启应用。自定义脚本将被加载。

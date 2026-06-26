@@ -1,0 +1,34 @@
+---
+title: 命令行选项
+---
+
+Chainlit CLI（命令行界面）是通过命令行与 Chainlit 系统交互的工具。它提供多个命令来管理 Chainlit 应用。
+
+## 命令
+
+### `init`
+
+`init` 命令通过创建位于 `.chainlit/config.toml` 的配置文件来初始化 Chainlit 项目
+
+```bash
+chainlit init
+```
+
+### `run`
+
+`run` 命令启动 Chainlit 应用。
+
+```bash
+chainlit run [OPTIONS] TARGET
+```
+
+选项：
+
+- `-w, --watch`：模块变更时重新加载应用。指定此选项时，将启动文件监视器，文件变更会导致服务器重新加载应用，便于快速迭代。
+- `-h, --headless`：阻止应用在浏览器中打开。
+- `-d, --debug`：将日志级别设置为 debug。默认日志级别为 error。
+- `-c, --ci`：以 CI 模式运行。
+- `--no-cache`：禁用第三方缓存，例如 langchain。
+- `--host`：指定运行服务器的不同主机。
+- `--port`：指定运行服务器的不同端口。
+- `--root-path`：指定运行服务器的子路径。

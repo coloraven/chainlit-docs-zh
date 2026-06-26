@@ -1,0 +1,149 @@
+---
+title: Discord
+---
+
+要让 Chainlit 应用在 Discord 上可用，你需要创建一个 Discord 应用并设置必要的环境变量。
+
+## 工作原理
+
+Discord 机器人会监听频道和私信中@它的消息。
+它会根据上下文将回复发送到专用线程或私信。
+
+<Frame caption="预览">
+  <img src="/images/discord/demo.gif" />
+</Frame>
+
+## 支持的功能
+
+| 消息 | 流式 | 元素 | 音频 | 询问用户 | 聊天历史 | 聊天配置 | 反馈 |
+| ------- | --------- | -------- | ----- | -------- | ------------ | ------------- | -------- |
+| ✅      | ❌        | ✅       | ❌    | ❌       | ✅           | ❌            | ✅       |
+
+## 安装 Discord 库
+
+Discord 库不包含在 Chainlit 依赖中。你需要手动安装。
+
+```bash
+pip install discord
+```
+
+## 创建 Discord 应用
+
+首先，导航到 [Discord apps dashboard](https://discord.com/developers/applications)。在此你应该会看到一个 New Application 按钮。点击此按钮，选择从头创建应用的选项。
+
+<Frame caption="创建 Discord 应用">
+  <img src="/images/discord/create-app.png" />
+</Frame>
+
+## 设置环境变量
+
+导航到 Bot 标签页，点击 `Reset Token`。这将使令牌可见。复制它并在 Chainlit 应用中设置为环境变量。
+
+<Frame caption="复制 Bot Token">
+  <img src="/images/discord/bot-token.png" />
+</Frame>
+
+```bash
+DISCORD_BOT_TOKEN=your_bot_token
+```
+
+## 设置 Intents
+
+导航到 Bot 标签页，启用 `MESSAGE CONTENT INTENT`，然后点击 Save Changes。
+
+<Frame caption="设置 Intents">
+  <img src="/images/discord/intent.png" />
+</Frame>
+
+## 本地开发
+
+如果你在本地工作，必须将本地 Chainlit 应用暴露到互联网，以接收 Discord 的传入消息。你可以使用 [ngrok](https://ngrok.com/)。
+
+```bash
+ngrok http 8000
+```
+
+## 启动 Chainlit 应用
+
+由于 Chainlit 应用未运行，Discord 机器人将无法与其通信。
+
+示例中，我们将使用这个简单应用：
+
+```python my_app.py
+import chainlit as cl
+
+@cl.on_message
+async def on_message(msg: cl.Message):
+    # 访问原始 discord 消息
+    print(cl.user_session.get("discord_message"))
+    # 访问 discord 用户
+    print(cl.user_session.get("user"))
+
+    # 访问可能附加的文件
+    attached_files = msg.elements
+
+    await cl.Message(content="你好，世界").send()
+```
+
+启动 Chainlit 应用。
+
+<Note>
+  使用 -h 以避免打开默认 Chainlit UI，因为我们使用的是 Discord。
+</Note>
+
+```bash
+chainlit run my_app.py -h
+```
+
+## 将 Discord 机器人安装到你的工作区
+
+导航到 OAuth2 标签页。在 OAuth2 URL Generator 中，选择 `bot` scope。
+
+<Frame caption="配置安装">
+  <img src="/images/discord/install-bot.png" />
+</Frame>
+
+然后，在 Bot Permissions 部分，选择以下权限。
+
+<Note>
+  你可以通过查看 URL 的 permissions 参数来确认是否选择了正确的权限。它应为 `377957238848`。
+</Note>
+
+<Frame caption="Bot Permissions">
+  <img src="/images/discord/bot-permissions.png" />
+</Frame>
+
+复制生成的 URL 并粘贴到浏览器中。系统将提示你将机器人添加到服务器。选择要添加机器人的服务器。
+
+就是这样！你现在应该可以通过 Discord 与 Chainlit 应用交互了。
+
+## 聊天历史
+
+聊天历史可直接通过 discord 获取。
+
+```python
+from chainlit.discord.app import client as discord_client
+
+import chainlit as cl
+import discord
+
+@cl.on_message
+async def on_message(msg: cl.Message):
+    # 每条 Discord 消息都会重置用户会话。
+    # 因此我们手动添加先前的聊天消息。
+    messages = cl.user_session.get("messages", [])
+    channel: discord.abc.MessageableChannel = cl.user_session.get("discord_channel")
+
+    if channel:
+        cl.user_session.get("messages")
+        discord_messages = [message async for message in channel.history(limit=10)]
+
+        # 遍历最近 10 条消息并移除当前消息。
+        for x in discord_messages[::-1][:-1]:
+            messages.append({
+                "role": "assistant" if x.author.name == discord_client.user.name else "user",
+                "content": x.clean_content if x.clean_content else x.channel.name # 第一条消息为空
+            })
+
+    # 你的代码写在这里
+```

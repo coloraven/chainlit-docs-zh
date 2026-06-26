@@ -1,0 +1,39 @@
+---
+title: FastAPI
+---
+
+Chainlit 可以作为 FastAPI 子应用挂载。
+
+```py my_cl_app
+import chainlit as cl
+
+@cl.on_chat_start
+async def main():
+    await cl.Message(content="你好，世界").send()
+```
+
+```py main
+from fastapi import FastAPI
+from chainlit.utils import mount_chainlit
+
+app = FastAPI()
+
+
+@app.get("/app")
+def read_main():
+    return {"message": "来自主应用的消息"}
+
+mount_chainlit(app=app, target="my_cl_app.py", path="/chainlit")
+```
+
+在上面的示例中，我们有一个带单个端点 `/app` 的 FastAPI 应用。我们将 Chainlit 应用 `my_cl_app.py` 挂载到 `/chainlit` 路径。
+
+启动 FastAPI 服务器：
+
+```bash
+uvicorn main:app --host 0.0.0.0 --port 80
+```
+
+<Note>
+使用 FastAPI 集成时，Header 身份认证是首选的用户认证方式。这种方式允许 Chainlit 将认证过程委托给父级 FastAPI 应用，从而实现更无缝、更安全的集成。
+</Note>

@@ -1,0 +1,21 @@
+---
+title: 迁移到 Chainlit v1.1.400
+---
+
+<Note>加入 Discord 获取实时更新：https://discord.gg/AzyvDHWARx</Note>
+
+## 更新 Chainlit
+
+通过将 Chainlit 更新到最新版本开始迁移：
+
+```bash
+pip install --upgrade chainlit
+```
+
+## 对思维链的更多控制
+
+`hide_cot` 配置参数已替换为 `cot`。`cot` 参数可设置为 `hidden`、`tool_call` 或 `full`。此参数控制 UI 中思维链（COT）的显示。
+
+## `disable_feedback` 已移除
+
+Chainlit 1.1.400 对反馈采用了不同方法。现在，用户输入会触发一次运行。运行完成后，用户可以为整个运行提供反馈，而不是为每条消息评分。此变更简化了反馈流程并使其更直观。

@@ -1,0 +1,110 @@
+---
+title: Semantic Kernel
+---
+
+在本教程中，我们将逐步创建一个与 [Microsoft Semantic Kernel](https://github.com/microsoft/semantic-kernel) 集成的 Chainlit 应用。该集成会自动将 Semantic Kernel 函数调用（如插件或工具）可视化为 Chainlit UI 中的[步骤](/concepts/step)。
+
+## 前置条件
+
+开始之前，请确保你已具备：
+
+- 已正确安装 Chainlit
+- 已安装 `semantic-kernel` 包
+- 为 Semantic Kernel 配置的 LLM API 密钥（例如 OpenAI、Azure OpenAI）
+- 对 Python 编程和 Semantic Kernel 概念（Kernel、Plugins、Functions）有基本了解
+
+## 步骤 1：创建 Python 文件
+
+在项目目录中创建一个名为 `app.py` 的新 Python 文件。该文件将包含使用 Semantic Kernel 的 LLM 应用主要逻辑。
+
+## 步骤 2：编写应用逻辑
+
+在 `app.py` 中，导入必要的包，设置 Semantic Kernel `Kernel`，添加用于 Chainlit 集成的 `SemanticKernelFilter`，并定义处理[聊天会话](/concepts/chat-lifecycle)和传入[消息](/concepts/message)的函数。
+
+以下示例演示如何设置 kernel 并使用 filter：
+
+```python app.py
+import chainlit as cl
+import semantic_kernel as sk
+from semantic_kernel.connectors.ai import FunctionChoiceBehavior
+from semantic_kernel.connectors.ai.open_ai import (
+    OpenAIChatCompletion,
+    OpenAIChatPromptExecutionSettings,
+)
+from semantic_kernel.functions import kernel_function
+from semantic_kernel.contents import ChatHistory
+
+request_settings = OpenAIChatPromptExecutionSettings(
+    function_choice_behavior=FunctionChoiceBehavior.Auto(filters={"excluded_plugins": ["ChatBot"]})
+)
+
+# 原生插件（工具）示例
+class WeatherPlugin:
+    @kernel_function(name="get_weather", description="获取指定城市的天气")
+    def get_weather(self, city: str) -> str:
+        """获取指定城市的天气。"""
+        if "paris" in city.lower():
+            return f"{city} 的天气是 20°C，晴天。"
+        elif "london" in city.lower():
+            return f"{city} 的天气是 15°C，多云。"
+        else:
+            return f"抱歉，我没有 {city} 的天气信息。"
+
+@cl.on_chat_start
+async def on_chat_start():
+    # 设置 Semantic Kernel
+    kernel = sk.Kernel()
+
+    # 添加 AI 服务（例如 OpenAI）
+    # 确保环境变量中已设置 OPENAI_API_KEY 和 OPENAI_ORG_ID
+    ai_service = OpenAIChatCompletion(service_id="default", ai_model_id="gpt-4o")
+    kernel.add_service(ai_service)
+
+    # 导入 WeatherPlugin
+    kernel.add_plugin(WeatherPlugin(), plugin_name="Weather")
+    
+    # 实例化并将 Chainlit filter 添加到 kernel
+    # 这将自动将函数调用捕获为步骤
+    sk_filter = cl.SemanticKernelFilter(kernel=kernel)
+
+    cl.user_session.set("kernel", kernel)
+    cl.user_session.set("ai_service", ai_service)
+    cl.user_session.set("chat_history", ChatHistory())
+
+@cl.on_message
+async def on_message(message: cl.Message):
+    kernel = cl.user_session.get("kernel") # type: sk.Kernel
+    ai_service = cl.user_session.get("ai_service") # type: OpenAIChatCompletion
+    chat_history = cl.user_session.get("chat_history") # type: ChatHistory
+
+    # 将用户消息添加到历史记录
+    chat_history.add_user_message(message.content)
+
+    # 创建用于响应流的 Chainlit 消息
+    answer = cl.Message(content="")
+
+    async for msg in ai_service.get_streaming_chat_message_content(
+        chat_history=chat_history,
+        user_input=message.content,
+        settings=request_settings,
+        kernel=kernel,
+    ):
+        if msg.content:
+            await answer.stream_token(msg.content)
+
+    # 将完整的助手响应添加到历史记录
+    chat_history.add_assistant_message(answer.content)
+
+    # 发送最终消息
+    await answer.send()
+```
+
+## 步骤 3：运行应用
+
+要启动应用，请打开终端并导航到包含 `app.py` 的目录。然后运行以下命令：
+
+```bash
+chainlit run app.py -w
+```
+
+`-w` 标志会启用 Chainlit 的自动重载，因此你无需在每次修改应用后重启服务器。你的聊天机器人 UI 现在应可通过 http://localhost:8000 访问。与机器人交互时，如果你询问天气（且 LLM 使用了工具），你应该会在 UI 中看到 "Weather-get_weather" [步骤](/concepts/step)。

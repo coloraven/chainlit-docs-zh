@@ -1,0 +1,52 @@
+{
+  "name": "Chainlit 中文文档",
+  "tabs": {
+    "Documentation": "文档",
+    "Examples": "示例",
+    "API Reference": "API 参考"
+  },
+  "groups": {
+    "Get Started": "快速开始",
+    "Integrations": "集成",
+    "Deploy": "部署",
+    "Platforms": "平台",
+    "React": "React",
+    "Basic Concepts": "基础概念",
+    "Advanced Features": "高级功能",
+    "Data Persistence": "数据持久化",
+    "Open Source Data Layers": "开源数据层",
+    "Authentication": "身份认证",
+    "Customisation": "自定义",
+    "Config": "配置",
+    "Backend": "后端",
+    "Guides": "指南",
+    "Migration Guides": "迁移指南",
+    "Examples": "示例",
+    "Life Cycle Hooks": "生命周期钩子",
+    "Chat": "聊天",
+    "Elements": "元素",
+    "Ask User": "询问用户",
+    "Misceallaneous": "其他",
+    "Data persistence": "数据持久化",
+    "Input Widgets": "输入控件"
+  },
+  "navbar": {
+    "primary": {
+      "label": "加入 Discord"
+    }
+  },
+  "global": {
+    "anchors": [
+      {
+        "anchor": "官方英文文档",
+        "href": "https://docs.chainlit.io",
+        "icon": "book-open"
+      },
+      {
+        "anchor": "Chainlit 帮助",
+        "href": "https://help.chainlit.io",
+        "icon": "comment"
+      }
+    ]
+  }
+}

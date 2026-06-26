@@ -1,0 +1,21 @@
+---
+title: 聊天历史
+---
+
+聊天历史允许用户搜索、浏览并恢复过去的对话。
+
+若已启用数据持久化但用户未通过身份认证，对话仍会被存储，但用户无法查看聊天历史。
+
+要启用聊天历史，需要同时配置数据持久化和[身份认证](/authentication)。
+
+<Frame caption="聊天历史">
+  <img src="/images/history.gif" />
+</Frame>
+
+## 恢复对话
+
+要让用户继续已持久化的对话，请使用 [cl.on_chat_resume](/api-reference/lifecycle-hooks/on-chat-resume)。
+
+<Frame caption="恢复对话">
+  <img src="/images/chat-resume.gif" />
+</Frame>

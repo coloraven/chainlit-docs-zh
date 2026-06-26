@@ -1,0 +1,46 @@
+---
+title: "Pyplot"
+---
+
+`Pyplot` 类允许你在聊天机器人 UI 中显示 Matplotlib pyplot 图表。此类接收一个 pyplot figure。
+
+此元素与 `Plotly` 元素的区别在于，使用 `Pyplot` 时用户看到的是图表的静态图片。
+
+## 属性
+
+<ParamField path="name" type="str">
+  在 UI 中显示的图表名称。
+</ParamField>
+
+<ParamField path="display" type="ElementDisplay" optional>
+  决定图表元素在 UI 中的显示方式。可选值为 "side"、"inline" 或 "page"。
+</ParamField>
+
+<ParamField path="size" type="ElementSize" optional>
+  决定图表大小。仅当 `display="inline"` 时生效。可选值为 "small"、"medium"（默认）或 "large"。
+</ParamField>
+
+<ParamField path="figure" type="str">
+  要显示的 `matplotlib.figure.Figure` 实例。
+</ParamField>
+
+## 示例
+
+```python
+import matplotlib.pyplot as plt
+import chainlit as cl
+
+
+@cl.on_chat_start
+async def main():
+    fig, ax = plt.subplots()
+    ax.plot([1, 2, 3, 4], [1, 4, 2, 3])
+
+    elements = [
+        cl.Pyplot(name="plot", figure=fig, display="inline"),
+    ]
+    await cl.Message(
+        content="这是一个简单的图表",
+        elements=elements,
+    ).send()
+```

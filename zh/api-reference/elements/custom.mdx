@@ -1,0 +1,280 @@
+---
+title: "Custom"
+---
+
+`CustomElement` 类允许你渲染自定义 `.jsx` 代码片段。`.jsx` 文件应放在 `public/elements/ELEMENT_NAME.jsx` 中。
+
+## 属性
+
+<ParamField path="name" type="str">
+  自定义 Element 的名称。应与 JSX 文件名（不含 `.jsx` 扩展名）一致。
+</ParamField>
+
+<ParamField path="props" type="Dict">
+  传递给 JSX 的 props。
+</ParamField>
+
+<ParamField path="display" type="ElementDisplay" default="inline" optional>
+  决定文本元素在 UI 中的显示方式。可选值为 "side"、"inline" 或 "page"。
+</ParamField>
+
+## 如何编写 JSX 文件
+
+<Note>如果你不熟悉 UI 开发，可以将以下说明交给 LLM，让它为你生成 `.jsx` 文件！</Note>
+
+要实现 Chainlit 自定义元素对应的 `jsx` 文件，请遵循以下说明。
+
+### 组件定义
+
+只写 JSX 代码，不要写 TSX。每个 `.jsx` 文件应默认导出一个组件，例如：
+
+```jsx
+export default function MyComponent() {
+    return <div>Hello World</div>
+}
+```
+
+组件 `props` 是全局注入的（不作为函数参数传入）。**切勿**将其作为函数参数传递。
+
+### 使用 Tailwind 进行样式设计
+
+底层代码会在 shadcn + tailwind 环境中渲染。
+主题依赖 CSS 变量。
+
+以下示例渲染一个带有主色背景和圆角的 `div`：
+
+```jsx
+export default function TailwindExample() {
+    return <div className="bg-primary rounded-md h-4 w-full" />
+}
+```
+
+### 仅使用允许的导入
+
+导入时仅可使用以下可用包。完整列表如下：
+
+- `react`
+- `sonner`
+- `zod`
+- `recoil`
+- `react-hook-form`
+- `lucide-react`
+- `@/components/ui/accordion`
+- `@/components/ui/aspect-ratio`
+- `@/components/ui/avatar`
+- `@/components/ui/badge`
+- `@/components/ui/button`
+- `@/components/ui/card`
+- `@/components/ui/carousel`
+- `@/components/ui/checkbox`
+- `@/components/ui/command`
+- `@/components/ui/dialog`
+- `@/components/ui/dropdown-menu`
+- `@/components/ui/form`
+- `@/components/ui/hover-card`
+- `@/components/ui/input`
+- `@/components/ui/label`
+- `@/components/ui/pagination`
+- `@/components/ui/popover`
+- `@/components/ui/progress`
+- `@/components/ui/scroll-area`
+- `@/components/ui/separator`
+- `@/components/ui/select`
+- `@/components/ui/sheet`
+- `@/components/ui/skeleton`
+- `@/components/ui/switch`
+- `@/components/ui/table`
+- `@/components/ui/textarea`
+- `@/components/ui/tooltip`
+
+<Note>`@/components/ui` 导入来自 Shadcn。</Note>
+
+### 可用 API
+
+Chainlit 全局暴露以下 API，使自定义元素具备交互能力。
+
+```ts
+interface APIs {
+    // 更新元素 props。这将重新渲染元素。
+    updateElement: (nextProps: Record<string, any>) => Promise<{success: boolean}>;
+    // 完全删除元素。
+    deleteElement: () => Promise<{success: boolean}>;
+    // 调用 Chainlit 应用中定义的操作
+    callAction: (action: {name: string, payload: Record<string, unknown>}) =>Promise<{success: boolean}>;
+    // 发送用户消息
+    sendUserMessage: (message: string, command?: string) => void;
+}
+```
+
+### 计数器元素示例
+
+```jsx
+import { Button } from "@/components/ui/button"
+import { X, Plus } from 'lucide-react';
+
+export default function Counter() {
+    return (
+        <div id="custom-counter" className="mt-4 flex flex-col gap-2">
+                <div>计数：{props.count}</div>
+                <Button id="increment" onClick={() => updateElement(Object.assign(props, {count: props.count + 1}))}><Plus /> 增加</Button>
+                <Button id="remove" onClick={deleteElement}><X /> 移除</Button>
+        </div>
+    );
+}
+```
+
+## 完整示例
+
+我们来构建一个自定义元素，用于渲染 Linear 工单的状态。
+
+首先，编写一个简单的 Chainlit 应用，模拟从 Linear 获取数据：
+
+```python app.py
+import chainlit as cl
+
+async def get_ticket():
+    """模拟从 Linear 获取数据"""
+    return {
+        "title": "修复身份认证 Bug",
+        "status": "in-progress",
+        "assignee": "Sarah Chen",
+        "deadline": "2025-01-15",
+        "tags": ["security", "high-priority", "backend"]
+    }
+
+@cl.on_message
+async def on_message(msg: cl.Message):
+    # 假设用户正在询问 Linear 工单。
+    # 通常 LLM 配合工具调用会决定是否渲染该组件。
+    
+    props = await get_ticket()
+    
+    ticket_element = cl.CustomElement(name="LinearTicket", props=props)
+    # 如果后续需要在服务端更新元素，可将其存储起来。
+    cl.user_session.set("ticket_el", ticket_element)
+    
+    await cl.Message(content="这是工单信息！", elements=[ticket_element]).send()
+```
+
+其次，实现 Python 代码中引用的自定义元素：
+
+```jsx public/elements/LinearTicket.jsx
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Progress } from "@/components/ui/progress"
+import { Clock, User, Tag } from "lucide-react"
+
+export default function TicketStatusCard() {
+  const getProgressValue = (status) => {
+    const progress = {
+      'open': 25,
+      'in-progress': 50,
+      'resolved': 75,
+      'closed': 100
+    }
+    return progress[status] || 0
+  }
+
+  return (
+    <Card className="w-full max-w-md">
+      <CardHeader className="pb-2">
+        <div className="flex justify-between items-center">
+          <CardTitle className="text-lg font-medium">
+            {props.title || '未命名工单'}
+          </CardTitle>
+          <Badge 
+            variant="outline" 
+          >
+            {props.status || '未知'}
+          </Badge>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          <Progress value={getProgressValue(props.status)} className="h-2" />
+          
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="flex items-center gap-2">
+              <User className="h-4 w-4 opacity-70" />
+              <span>{props.assignee || '未分配'}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4 opacity-70" />
+              <span>{props.deadline || '无截止日期'}</span>
+            </div>
+            <div className="flex items-center gap-2 col-span-2">
+              <Tag className="h-4 w-4 opacity-70" />
+              <span>{props.tags?.join(', ') || '无标签'}</span>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+```
+
+最后，使用 `chainlit run app.py` 启动应用，并在 UI 中发送第一条消息。
+
+<Frame caption="渲染后的 LinearTicket 自定义元素。">
+  <img src="/images/custom-element.png" />
+</Frame>
+
+## 高级用法
+
+### 从 Python 更新 Props
+
+要从 Python 代码更新自定义元素的 props，可将元素实例存储在用户会话中，并调用 `.update()`。
+
+```python
+import chainlit as cl
+
+@cl.on_chat_start
+async def start():
+    element = cl.CustomElement(name="Foo", props={"foo": "bar"})
+    cl.user_session.set("element", element)
+
+@cl.on_message
+async def on_message():
+    element = cl.user_session.get("element")
+    element.props["foo"] = "baz"
+    await element.update()
+```
+
+### 从 Python 调用函数
+
+如果需要在 Python 代码中直接调用函数，可以使用 `cl.CopilotFunction`。
+
+```python call_func.py
+import chainlit as cl
+
+@cl.on_chat_start
+async def start():
+    element = cl.CustomElement(name="CallFn")
+    await cl.Message(content="Hello", elements=[element]).send()
+    
+@cl.on_message
+async def on_msg(msg: cl.Message):
+    fn = cl.CopilotFunction(name="test", args={"content": msg.content})
+    res = await fn.acall()
+```
+
+```jsx CallFn.jsx
+import { useEffect } from 'react';
+import { useRecoilValue } from 'recoil';
+import { callFnState } from '@chainlit/react-client';
+
+export default function CallFnExample() {
+    const callFn = useRecoilValue(callFnState);
+
+    useEffect(() => {
+        if (callFn?.name === "test") {
+          // 将 console.log 替换为你的实际函数
+          console.log("函数已调用，参数为", callFn.args.content)
+          callFn.callback()
+        }
+      }, [callFn]);
+
+      return null
+}
+```

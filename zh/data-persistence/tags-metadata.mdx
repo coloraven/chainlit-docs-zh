@@ -1,0 +1,15 @@
+---
+title: 标签与元数据
+---
+
+标签和元数据为会话线程、步骤和生成内容提供有价值的上下文。
+
+```py
+@cl.step(type="run")
+async def func(input):
+    # 一些代码
+    cl.context.current_step.metadata = {"experiment":"1"}
+    cl.context.current_step.tags = ["to review"]
+    # 一些代码
+    return output
+```

@@ -1,0 +1,194 @@
+---
+title: "聊天配置"
+---
+
+用于定义聊天配置列表的装饰器。
+
+如果启用了身份认证，你可以访问用户详情以有条件地创建聊天配置列表。
+
+图标为可选项。
+
+## 参数
+
+<ParamField path="current_user" type="User">
+  来自 UI 的消息。
+</ParamField>
+
+## ChatProfile 字段
+
+| 字段 | 类型 | 必填 | 说明 |
+| ----- | ---- | -------- | ----------- |
+| `name` | `str` | 是 | 内部标识符。存储在 `user_session` 中，键为 `"chat_profile"`。 |
+| `markdown_description` | `str` | 是 | 在配置选择器中显示的描述，支持 Markdown。 |
+| `icon` | `str` | 否 | 配置图标的 URL。 |
+| `display_name` | `str` | 否 | 在 UI 中显示的用户可见标签。若省略则回退到 `name`。 |
+| `starters` | `list[Starter]` | 否 | 选择此配置时显示的启动建议消息。 |
+| `config_overrides` | `ChainlitConfigOverrides` | 否 | 按配置覆盖的全局配置。 |
+
+## 用法
+
+```python Simple example
+import chainlit as cl
+
+
+@cl.set_chat_profiles
+async def chat_profile():
+    return [
+        cl.ChatProfile(
+            name="GPT-3.5",
+            markdown_description="底层 LLM 模型为 **GPT-3.5**。",
+            icon="https://picsum.photos/200",
+        ),
+        cl.ChatProfile(
+            name="GPT-4",
+            markdown_description="底层 LLM 模型为 **GPT-4**。",
+            icon="https://picsum.photos/250",
+        ),
+    ]
+
+@cl.on_chat_start
+async def on_chat_start():
+    chat_profile = cl.user_session.get("chat_profile")
+    await cl.Message(
+        content=f"正在使用 {chat_profile} 聊天配置开始聊天"
+    ).send()
+```
+
+```python With authentication
+from typing import Optional
+
+import chainlit as cl
+
+
+@cl.set_chat_profiles
+async def chat_profile(current_user: cl.User):
+    if current_user.metadata["role"] != "ADMIN":
+        return None
+
+    return [
+        cl.ChatProfile(
+            name="GPT-3.5",
+            markdown_description="底层 LLM 模型为 **GPT-3.5**，一个基于 410GB 文本数据训练的 *1750 亿参数* 模型。",
+        ),
+        cl.ChatProfile(
+            name="GPT-4",
+            markdown_description="底层 LLM 模型为 **GPT-4**，一个基于 3.5TB 文本数据训练的 *1.5 万亿参数* 模型。",
+            icon="https://picsum.photos/250",
+        ),
+        cl.ChatProfile(
+            name="GPT-5",
+            markdown_description="底层 LLM 模型为 **GPT-5**。",
+            icon="https://picsum.photos/200",
+        ),
+    ]
+
+
+@cl.password_auth_callback
+def auth_callback(username: str, password: str) -> Optional[cl.User]:
+    if (username, password) == ("admin", "admin"):
+        return cl.User(identifier="admin", metadata={"role": "ADMIN"})
+    else:
+        return None
+
+
+@cl.on_chat_start
+async def on_chat_start():
+    user = cl.user_session.get("user")
+    chat_profile = cl.user_session.get("chat_profile")
+    await cl.Message(
+        content=f"用户 {user.identifier} 正在使用 {chat_profile} 聊天配置开始聊天"
+    ).send()
+```
+
+## 本地化
+
+`@cl.set_chat_profiles` 回调接受可选的 `language` 参数，允许你返回本地化的聊天配置标签和描述。
+
+```python With localization
+import chainlit as cl
+
+
+@cl.set_chat_profiles
+async def chat_profile(current_user: cl.User, language: str):
+    if language == "fr":
+        return [
+            cl.ChatProfile(
+                name="GPT-4",
+                markdown_description="Le modèle sous-jacent est **GPT-4**.",
+                icon="https://picsum.photos/250",
+            ),
+        ]
+    return [
+        cl.ChatProfile(
+            name="GPT-4",
+            markdown_description="The underlying LLM model is **GPT-4**.",
+            icon="https://picsum.photos/250",
+        ),
+    ]
+```
+
+## 显示名称
+
+使用 `display_name` 可在 UI 中显示用户友好的标签，同时在 `name` 中保留稳定的内部标识符。这适用于本地化名称或包含特殊字符的名称。
+
+```python
+import chainlit as cl
+
+@cl.set_chat_profiles
+async def chat_profile():
+    return [
+        cl.ChatProfile(
+            name="ad_designer",          # 存储在 user_session 中的内部 ID
+            display_name="广告设计师",    # 在 UI 中显示
+            markdown_description="用于广告设计任务的配置。",
+        ),
+        cl.ChatProfile(
+            name="copywriter",
+            display_name="Copywriter",
+            markdown_description="用于写作任务的配置。",
+        ),
+    ]
+
+@cl.on_chat_start
+async def on_chat_start():
+    # user_session 始终保存内部 `name`，而非 display_name
+    chat_profile = cl.user_session.get("chat_profile")  # "ad_designer"
+```
+
+<Note>
+  自 **2.8.5** 版本起。
+</Note>
+
+## 动态配置
+
+你可以通过配置覆盖项，为特定 ChatProfile 覆盖全局 `config.toml`。
+
+```python
+from chainlit.config import (
+    ChainlitConfigOverrides,
+    FeaturesSettings,
+    McpFeature,
+    UISettings,
+)
+
+@cl.set_chat_profiles
+async def chat_profile(current_user: cl.User):
+    return [
+        cl.ChatProfile(
+            name="MCP Enabled",
+            markdown_description="启用 **MCP 功能** 的配置。此配置已激活 *Model Context Protocol* 支持。[了解更多](https://example.com/mcp)",
+            icon="https://picsum.photos/250",
+            starters=starters,
+            config_overrides=ChainlitConfigOverrides(
+                ui=UISettings(name="MCP UI"),
+                features=FeaturesSettings(
+                    mcp=McpFeature(
+                        enabled=True,
+                        stdio={"enabled": True},
+                        sse={"enabled": True},
+                        streamable_http={"enabled": True},
+                    )
+                ),
+            ),
+        ),
+```

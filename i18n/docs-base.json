@@ -1,0 +1,46 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "colors": {
+    "primary": "#F80061",
+    "light": "#FFE7EB",
+    "dark": "#980039"
+  },
+  "favicon": "/favicon.svg",
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg",
+    "href": "https://github.com/Chainlit/chainlit"
+  },
+  "appearance": {
+    "default": "dark",
+    "strict": false
+  },
+  "background": {
+    "color": {
+      "dark": "#111010"
+    }
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Github",
+        "href": "https://github.com/Chainlit/chainlit"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Join Discord",
+      "href": "https://discord.gg/k73SQ3FyUh"
+    }
+  },
+  "footer": {
+    "socials": {
+      "github": "https://github.com/Chainlit/chainlit",
+      "discord": "https://discord.gg/k73SQ3FyUh",
+      "x": "https://x.com/chainlit_io",
+      "linkedin": "https://www.linkedin.com/company/chainlit"
+    }
+  },
+  "redirects": []
+}

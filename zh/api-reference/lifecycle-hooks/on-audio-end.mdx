@@ -1,0 +1,17 @@
+---
+title: "on_audio_end"
+---
+
+用于响应来自用户麦克风的音频录制结束事件的钩子。
+
+## 用法
+
+```python
+from io import BytesIO
+import chainlit as cl
+
+
+@cl.on_audio_end
+async def on_audio_end():
+    pass
+```

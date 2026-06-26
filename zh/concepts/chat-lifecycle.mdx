@@ -1,0 +1,57 @@
+---
+title: 聊天生命周期
+---
+
+每当用户连接到你的 Chainlit 应用时，都会创建一个新的聊天会话。聊天会话会经历一系列生命周期事件，你可以通过定义钩子来响应这些事件。
+
+## On Chat Start
+
+[on_chat_start](/api-reference/lifecycle-hooks/on-chat-start) 装饰器用于定义在新聊天会话创建时调用的钩子。
+
+```python
+@cl.on_chat_start
+def on_chat_start():
+    print("新聊天会话已启动！")
+```
+
+## On Message
+
+[on_message](/api-reference/lifecycle-hooks/on-message) 装饰器用于定义在收到用户新消息时调用的钩子。
+
+```python
+@cl.on_message
+def on_message(msg: cl.Message):
+    print("用户发送：", msg.content)
+```
+
+## On Stop
+
+`on_stop` 装饰器用于定义在用户点击停止按钮（此时有任务正在运行）时调用的钩子。
+
+```python
+@cl.on_stop
+def on_stop():
+    print("用户想要停止任务！")
+```
+
+## On Chat End
+
+[on_chat_end](/api-reference/lifecycle-hooks/on-chat-end) 装饰器用于定义在聊天会话结束时调用的钩子，结束原因可能是用户断开连接或开始了新的聊天会话。
+
+```python
+@cl.on_chat_end
+def on_chat_end():
+    print("用户已断开连接！")
+```
+
+## On Chat Resume
+
+[on_chat_resume](/api-reference/lifecycle-hooks/on-chat-resume) 装饰器用于定义在用户恢复先前断开连接的聊天会话时调用的钩子。这仅在启用了[身份认证](/authentication)和[数据持久化](/data-persistence)时才会发生。
+
+```python
+from chainlit.types import ThreadDict
+
+@cl.on_chat_resume
+async def on_chat_resume(thread: ThreadDict):
+    print("用户恢复了先前的聊天会话！")
+```

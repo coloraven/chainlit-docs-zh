@@ -1,0 +1,42 @@
+---
+title: "窗口消息"
+---
+
+# on_window_message
+
+用于响应来自 Web 应用父窗口消息的装饰器。
+每当收到新的窗口消息时，被装饰的函数都会被调用。
+
+## 参数
+
+<ParamField path="message" type="str">
+  来自 Web 应用父窗口的消息。
+</ParamField>
+
+## 用法
+
+```python
+import chainlit as cl
+
+@cl.on_window_message
+def main(message: str):
+  # 在此处理消息
+```
+
+# send_window_message
+
+向 Web 应用父窗口发送消息的函数。
+
+## 参数
+
+<ParamField path="message" type="str">
+  要发送到 Web 应用父窗口的消息。
+</ParamField>
+
+## 用法
+
+```python
+@cl.on_message
+async def message():
+  await cl.send_window_message("Server: Hello from Chainlit")
+```

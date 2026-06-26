@@ -1,0 +1,100 @@
+---
+title: 自定义数据层
+---
+
+`BaseDataLayer` 类是 Chainlit 框架内数据持久化操作的抽象基础。
+该类定义了在聊天机器人应用中管理用户、反馈、元素、步骤和会话线程的方法。
+
+## 方法
+
+<ParamField path="async get_user(self, identifier: str)" type="Coroutine">
+  通过标识符获取用户。返回类型可选为 `PersistedUser`。
+</ParamField>
+
+<ParamField path="async create_user(self, user: User)" type="Coroutine">
+  根据提供的 `User` 实例创建新用户。返回类型可选为 `PersistedUser`。
+</ParamField>
+
+<ParamField path="async upsert_feedback(self, feedback: Feedback)" type="Coroutine">
+  插入或更新反馈。接受 `Feedback` 实例，并返回持久化反馈的标识符字符串。
+</ParamField>
+
+<ParamField path="async delete_feedback(self, feedback_id: str)" type="Coroutine">
+  通过 `feedback_id` 删除反馈。成功时返回 `True`。
+</ParamField>
+
+<ParamField path="async create_element(self, element_dict: ElementDict)" type="Coroutine" optional>
+  向数据层添加新元素。接受 `ElementDict` 作为参数。
+</ParamField>
+
+<ParamField path="async get_element(self, thread_id: str, element_id: str)" type="Coroutine">
+  通过 `thread_id` 和 `element_id` 检索元素。返回类型可选为 `ElementDict`。
+</ParamField>
+
+<ParamField path="async delete_element(self, element_id: str)" type="Coroutine" optional>
+  通过标识符 `element_id` 删除元素。
+</ParamField>
+
+<ParamField path="async create_step(self, step_dict: StepDict)" type="Coroutine" optional>
+  在数据层中创建新步骤。接受 `StepDict` 作为参数。
+</ParamField>
+
+<ParamField path="async update_step(self, step_dict: StepDict)" type="Coroutine" optional>
+  更新现有步骤。接受 `StepDict` 作为参数。
+</ParamField>
+
+<ParamField path="async delete_step(self, step_id: str)" type="Coroutine" optional>
+  通过标识符 `step_id` 删除步骤。
+</ParamField>
+
+<ParamField path="async get_thread_author(self, thread_id: str)" type="Coroutine">
+  通过 `thread_id` 获取给定会话线程的作者。返回表示作者标识符的字符串。
+</ParamField>
+
+<ParamField path="async delete_thread(self, thread_id: str)" type="Coroutine">
+  通过标识符 `thread_id` 删除会话线程。
+</ParamField>
+
+<ParamField path="async list_threads(self, pagination: Pagination, filters: ThreadFilter)" type="Coroutine">
+  根据 `pagination` 和 `filters` 参数列出会话线程。返回 `PaginatedResponse[ThreadDict]`。
+</ParamField>
+
+<ParamField path="async get_thread(self, thread_id: str)" type="Coroutine">
+  通过标识符 `thread_id` 检索会话线程。返回类型可选为 `ThreadDict`。
+</ParamField>
+
+<ParamField path="async update_thread(self, thread_id: str, name: Optional[str] = None, user_id: Optional[str] = None, metadata: Optional[Dict] = None, tags: Optional[List[str]] = None)" type="Coroutine">
+  更新会话线程的详细信息，如 name、user_id、metadata 和 tags。参数大多为可选。
+</ParamField>
+
+<ParamField path="async delete_user_session(self, id: str)" type="Coroutine">
+  通过标识符 `id` 删除用户会话。返回表示是否成功的布尔值。
+</ParamField>
+
+<ParamField path="async get_favorite_steps(self, user_id: str)" type="Coroutine">
+  返回用户标记为收藏的步骤列表。用于在编辑器中填充收藏消息（提示词模板）功能。返回 `List[StepDict]`。
+
+  <Note>
+    Since version **2.9.5**.
+  </Note>
+</ParamField>
+
+<ParamField path="async close(self)" type="Coroutine">
+  在 Chainlit 服务器关闭时调用。用于关闭数据库连接、HTTP 会话或数据层持有的其他资源。所有子类都必须实现此方法。
+
+  <Warning>
+    Since version **2.8.2**. This is a **breaking change** — 所有自定义 `BaseDataLayer` 和 `BaseStorageClient` 子类都必须实现此方法。
+  </Warning>
+</ParamField>
+
+## 装饰器
+
+<ParamField path="queue_until_user_message()" type="Decorator">
+  将某些方法排队，使其仅在收到第一条用户消息后执行，对 `WebsocketSessions` 尤其有用。
+</ParamField>
+
+## 示例
+
+由于 `BaseDataLayer` 的抽象性质，若不通过子类化并实现抽象方法，直接实例化和使用并不实际。
+
+你可以参考[自定义数据层实现指南](/data-layers/overview)。

@@ -1,0 +1,60 @@
+---
+title: "RadioGroup"
+---
+
+### 属性
+
+<ParamField path="id" type="str">
+  用于从设置中检索控件值的标识符。
+</ParamField>
+
+<ParamField path="label" type="str">
+  输入控件的标签。
+</ParamField>
+
+<ParamField path="values" type="List[str]" optional>
+  单选选项的标签。
+</ParamField>
+
+<ParamField path="items" type="Dict[str, str]" optional>
+  单选选项的标签及其对应值。
+</ParamField>
+
+<ParamField path="initial_value" type="str" optional>
+  初始选中的值。
+</ParamField>
+
+<ParamField path="initial_index" type="int" optional>
+  初始值的索引。只能与 `values` 配合使用。
+</ParamField>
+
+<ParamField path="tooltip" type="str" optional>
+  悬停在标签旁工具提示图标上时显示的工具提示文本。
+</ParamField>
+
+<ParamField path="description" type="str" optional>
+  显示在输入控件下方的文本。
+</ParamField>
+
+### 用法
+
+```python Code Example
+import chainlit as cl
+from chainlit.input_widget import RadioGroup
+
+
+@cl.on_chat_start
+async def start():
+    settings = await cl.ChatSettings(
+        [
+            RadioGroup(
+                id="ResponseLength",
+                label="回复长度",
+                values=["短", "中等", "长"],
+                initial_index=1,
+            )
+        ]
+    ).send()
+    value = settings["ResponseLength"]
+
+```

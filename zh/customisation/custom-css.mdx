@@ -1,0 +1,57 @@
+---
+title: CSS
+---
+
+Chainlit 应用允许通过自定义 CSS 样式表进行设计定制。要启用此功能，请在 `.chainlit/config.toml` 中修改配置设置。
+
+```toml config.toml
+[UI]
+# ...
+# 可以是 public 目录中的 css 文件或 URL
+custom_css = '/public/stylesheet.css'
+```
+
+<Note>
+  目前我们不提供所有可用 css 类的详细指南。
+  你需要在 Web 检查器中自行查找希望覆盖的 css 类。
+</Note>
+
+配置更新后，重启应用。自定义样式将被应用。
+
+## CSS 变量
+
+Chainlit 暴露了 CSS 变量，让你无需深入类名即可定制特定 UI 元素。
+
+### 停止图标与加载光标
+
+你可以覆盖停止按钮图标和加载（闪烁）光标的外观与动画：
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `--stop-icon-mask` | 停止图标形状的 SVG data URI | 内置方形图标 |
+| `--stop-icon-color` | 停止图标颜色 | `currentColor` |
+| `--stop-icon-animation` | 停止图标 CSS 动画 | `none` |
+| `--loading-cursor-mask` | 加载光标形状的 SVG data URI | 内置圆形 |
+| `--loading-cursor-color` | 加载光标颜色 | `hsl(var(--foreground))` |
+| `--loading-cursor-size` | 加载光标大小 | `0.875rem` |
+| `--loading-cursor-animation` | 加载光标 CSS 动画 | `pulse` |
+
+```css
+:root {
+    --stop-icon-animation: my-pulse 2s ease-in-out infinite;
+    --loading-cursor-animation: my-breathe 2s ease-in-out infinite;
+    --loading-cursor-size: 1.25rem;
+}
+@keyframes my-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.92); }
+}
+@keyframes my-breathe {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.35; transform: scale(0.85); }
+}
+```
+
+<Note>
+  自版本 **2.11.0** 起。
+</Note>

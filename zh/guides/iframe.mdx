@@ -1,0 +1,64 @@
+---
+title: 嵌入 Iframe
+---
+
+本节概述将 Chainlit 提供的外部 Chatbot UI 嵌入现有前端服务的步骤和规范。此集成通过 HTML `<iframe>` 实现。下面详述需要注意的属性和考虑事项。
+
+## 概览
+
+`<iframe>` 标签指定内联框架，用于在当前 HTML 文档中嵌入另一个文档。在此场景中，我们嵌入位于不同 URL 的 Chainlit Chatbot 界面。
+
+## 代码片段
+
+以下是用于嵌入 Chatbot UI 的 `<iframe>` 基本设置：
+
+```html
+<iframe
+    src="https://your-chainlit-instance.com"  /* chatbot 界面的 URL */
+    width="100%"  /* iframe 占父元素全宽 */
+    height="600px"  /* iframe 固定高度 */
+    frameBorder="0"  /* iframe 无边框 */
+    title="Embedded Webpage"  /* 用于无障碍的描述性标题 */
+    style={{ border: 'none' }}  /* 额外样式选项 */
+></iframe>
+```
+
+## 属性与样式
+
+- `src`：要嵌入页面的 URL。应为 Chainlit chatbot 界面的 URL。
+- `width` 和 `height`：定义 iframe 尺寸。宽度设为父容器的 100%，高度固定为 600px。根据布局需求调整。
+- `frameBorder`：指定 iframe 周围是否显示边框。设为 "0" 以避免边框，使嵌入页面与内容无缝融合。
+- `title`：框架内容的文本描述，为屏幕阅读器等辅助技术提供重要信息。
+- `style`：iframe 的内联 CSS。此处用于确保 iframe 无边框，也可包含其他样式。
+
+## 安全考虑
+
+嵌入 iframe 时，请考虑以下安全影响：
+
+- **混合内容**：确保嵌入内容通过 HTTPS 提供，防止混合内容问题（HTTPS 页面包含 HTTP 元素）。
+- **沙箱**：若需要额外安全，尤其是嵌入不可信来源内容时，考虑使用 `sandbox` 属性限制内容。
+- **内容安全策略（CSP）**：若网站使用 CSP，确保策略允许从指定 URL 嵌入外部内容。
+
+## 无障碍
+
+确保嵌入界面符合无障碍指南：
+
+- `title` 属性应准确描述嵌入内容，供屏幕阅读器使用。
+- 确保 iframe 内的 chatbot 界面本身按无障碍标准构建，具备键盘导航和 ARIA 角色与属性等功能。
+
+## 响应式设计
+
+为保持响应式设计：
+
+- 在多种视口中测试 iframe，观察其对不同屏幕尺寸的响应。宽度设为 100%，应随父容器宽度调整，但其他方面可能无法同样干净地调整。
+- 考虑使用 CSS 和 JavaScript 根据视口大小动态调整 iframe 尺寸。
+
+## 故障排除
+
+- **内容被阻止**：若 iframe 内容未加载，确保未被浏览器策略或扩展阻止。
+- **跨域问题**：检查与 CORS 相关的控制台错误。托管 chatbot UI 的服务器必须设置适当头，允许内容嵌入到你的域名。
+- **布局偏移**：若布局意外偏移，验证 iframe 固定高度是否在较小屏幕上造成视觉问题。
+
+## 总结
+
+在 iframe 中嵌入 Chainlit chatbot 界面使用户可直接在平台上与 chatbot 交互。但这需要仔细关注安全、无障碍和响应式设计。需要定期测试和更新以维护集成的完整性和用户友好性。

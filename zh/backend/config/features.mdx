@@ -1,0 +1,151 @@
+---
+title: 功能
+---
+
+## 选项
+
+### 文件上传
+
+<ParamField path="spontaneous_file_upload.enabled" type="bool" optional>
+  允许用户随消息上传文件。文件可在
+  [cl.on_message](/api-reference/lifecycle-hooks/on-message) 中访问。
+</ParamField>
+
+<ParamField
+  path="spontaneous_file_upload.accept"
+  type="Union[List[str], Dict[str, List[str]]]"
+  optional
+>
+  限制用户只能上传接受的 MIME 文件类型。示例：["text/plain",
+  "application/pdf", "image/x-png"]
+</ParamField>
+
+<ParamField path="spontaneous_file_upload.max_files" type="int" optional>
+  限制用户一次最多上传的文件数量。
+</ParamField>
+
+<ParamField path="spontaneous_file_upload.max_size_mb" type="int" optional>
+  限制上传文件大小（MB）。
+</ParamField>
+
+### 音频
+
+<ParamField path="audio.enabled" type="bool" default={false}>
+  启用音频功能。
+</ParamField>
+
+<Warning>
+  自 Chainlit 2.7.0 起，必须在 `config.toml` 中将 `audio.enabled` 显式设置为 `true`。不再根据是否存在 `on_audio_chunk` 回调自动推断。
+</Warning>
+
+<ParamField path="audio.sample_rate" type="int" default={24000}>
+  音频采样率（赫兹）。默认为 24kHz
+</ParamField>
+
+### MCP
+
+请参阅 [MCP 服务端配置](/advanced-features/mcp#server-side-configuration-config-toml)
+
+### Slack
+
+请参阅 [Slack 集成文档](/deploy/slack)
+
+### 收藏
+
+<ParamField path="favorites" type="bool" default={false}>
+  启用收藏消息（提示词模板）。启用后，用户可以星标自己的消息，并从编辑器中将其复用为提示词模板。需要[数据持久化](/data-persistence/overview)来存储收藏。
+
+  <Note>
+    自版本 **2.9.5** 起。
+  </Note>
+</ParamField>
+
+### 其他
+
+<ParamField path="latex" type="bool" default={false}>
+  处理并显示数学表达式。这可能与消息中的 "$" 字符冲突。
+</ParamField>
+
+<ParamField path="user_message_autoscroll" type="bool" default={true}>
+  在窗口顶部自动滚动新用户消息。
+</ParamField>
+
+<ParamField path="assistant_message_autoscroll" type="bool" default={true}>
+  在助手消息流式输出时自动滚动。设置为 `false` 可在新助手 token 到达时保持视口稳定。
+
+  <Note>
+    自版本 **2.9.4** 起。
+  </Note>
+</ParamField>
+
+<ParamField path="unsafe_allow_html" type="bool" default={false}>
+  处理并显示消息中的 HTML。这可能存在安全风险（参见
+  https://stackoverflow.com/questions/19603097/why-is-it-dangerous-to-render-user-generated-html-or-javascript）。
+</ParamField>
+
+<ParamField path="auto_tag_thread" type="bool" default={true}>
+  使用当前聊天配置（若使用了聊天配置）自动为会话线程添加标签
+</ParamField>
+
+<ParamField path="edit_message" type="bool" default={true}>
+  允许用户编辑自己的消息。
+</ParamField>
+
+<ParamField path="allow_thread_sharing" type="bool" default={false}>
+  允许用户与其他用户共享会话线程。需要[身份认证](/authentication/overview)、[数据持久化](/data-persistence/overview)以及 [`on_shared_thread_view`](/api-reference/lifecycle-hooks/on-shared-thread-view) 回调。
+</ParamField>
+
+## 默认配置
+
+```toml
+[features]
+# 处理并显示消息中的 HTML。这可能存在安全风险（参见 https://stackoverflow.com/questions/19603097/why-is-it-dangerous-to-render-user-generated-html-or-javascript）
+unsafe_allow_html = false
+
+# 处理并显示数学表达式。这可能与消息中的 "$" 字符冲突。
+latex = false
+
+# 在窗口顶部自动滚动新用户消息
+user_message_autoscroll = true
+
+# 在助手消息流式输出时自动滚动
+assistant_message_autoscroll = true
+
+# 使用当前聊天配置（若使用了聊天配置）自动为会话线程添加标签
+auto_tag_thread = true
+
+# 允许用户编辑自己的消息
+edit_message = true
+
+# 允许用户共享会话线程（需要 on_shared_thread_view 回调）
+allow_thread_sharing = false
+
+# 启用收藏消息（提示词模板）
+favorites = false
+
+# 允许用户随消息自发上传文件
+[features.spontaneous_file_upload]
+    enabled = true
+    # 使用 MIME 类型定义接受的文件类型
+    # 示例：
+    # 1. 特定文件类型：
+    #    accept = ["image/jpeg", "image/png", "application/pdf"]
+    # 2. 某类所有文件：
+    #    accept = ["image/*", "audio/*", "video/*"]
+    # 3. 特定文件扩展名：
+    #    accept = {{ "application/octet-stream" = [".xyz", ".pdb"] }}
+    # 注意：不建议使用 "*/*"，可能导致浏览器警告
+    accept = ["*/*"]
+    max_files = 20
+    max_size_mb = 500
+
+[features.audio]
+    # 启用音频功能
+    enabled = false
+    # 音频采样率
+    sample_rate = 24000
+
+[features.mcp]
+    # 启用 Model Context Protocol (MCP) 功能
+    enabled = false
+```

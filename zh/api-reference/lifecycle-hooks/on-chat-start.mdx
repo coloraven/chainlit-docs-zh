@@ -1,0 +1,20 @@
+---
+title: "on_chat_start"
+---
+
+用于响应用户 WebSocket 连接事件的钩子。
+
+## 用法
+
+```python Code Example
+from chainlit import AskUserMessage, Message, on_chat_start
+
+
+@on_chat_start
+async def main():
+    res = await AskUserMessage(content="你叫什么名字？", timeout=30).send()
+    if res:
+        await Message(
+            content=f"你的名字是：{res['output']}。\nChainlit 安装成功！\n现在你可以开始构建自己的 Chainlit 应用了！",
+        ).send()
+```

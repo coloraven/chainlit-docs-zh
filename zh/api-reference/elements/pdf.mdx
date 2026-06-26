@@ -1,0 +1,71 @@
+---
+title: "PDF 查看器"
+---
+
+`Pdf` 类允许你在聊天机器人 UI 中显示远程或本地托管的 PDF。此类接收在线托管 PDF 的 URL，或本地 PDF 的路径。
+
+<Note>
+  自 **2.11.0** 版本起，PDF 查看器使用基于 React 的自定义渲染器，提供缩放、分页、下载和打印控件，替代浏览器内置的 iframe 查看器。`pdfjs-dist` worker 已本地打包——不会发起外部 CDN 请求。如果你依赖之前的 iframe 行为，或对旧查看器应用了自定义 CSS，可能需要更新样式。
+</Note>
+
+## 属性
+
+<ParamField path="name" type="str">
+  在 UI 中显示的 PDF 名称。
+</ParamField>
+
+<ParamField path="display" type="ElementDisplay" optional>
+  决定 PDF 元素在 UI 中的显示方式。可选值为 "side"、"inline" 或 "page"。
+</ParamField>
+
+<ParamField path="url" type="str">
+  PDF 文件的远程 URL。远程 PDF 必须提供 url（本地 PDF 则提供 path 或 content）。
+</ParamField>
+
+<ParamField path="path" type="str" optional>
+  PDF 的本地文件路径。本地 PDF 必须提供 path 或 content（远程 PDF 则提供 url）。
+</ParamField>
+
+<ParamField path="content" type="bytes" optional>
+  PDF 的文件内容（字节格式）。本地 PDF 必须提供 path 或 content（远程 PDF 则提供 url）。
+</ParamField>
+
+<ParamField path="page" type="int" optional>
+  默认渲染的页码。必须是大于 0 且小于等于 PDF 总页数的整数。默认值为 1。
+</ParamField>
+
+## 示例
+
+### Inline
+
+```python
+import chainlit as cl
+
+
+@cl.on_chat_start
+async def main():
+    # 使用本地文件路径发送 PDF
+    elements = [
+      cl.Pdf(name="pdf1", display="inline", path="./pdf1.pdf", page=1)
+    ]
+
+    await cl.Message(content="看看这个本地 PDF！", elements=elements).send()
+```
+
+### Side 和 Page
+
+消息内容中必须包含 PDF 的名称，才能创建链接。
+
+```python
+import chainlit as cl
+
+
+@cl.on_chat_start
+async def main():
+    # 使用本地文件路径发送 PDF
+    elements = [
+      cl.Pdf(name="pdf1", display="side", path="./pdf1.pdf", page=1)
+    ]
+    # 提醒：PDF 名称必须出现在消息内容中
+    await cl.Message(content="看看这个本地 pdf1！", elements=elements).send()
+```

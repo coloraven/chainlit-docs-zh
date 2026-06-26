@@ -1,0 +1,116 @@
+---
+title: SQLAlchemy 数据层
+---
+
+此自定义数据层已在 PostgreSQL 上测试，但由于使用了 SQL Alchemy 数据库，应支持更多 SQL 数据库。
+
+此数据层还支持 `BaseStorageClient`，可将元素存储到 Azure Blob Storage 或 AWS S3。
+
+<Warning>
+  以下 schema 反映 Chainlit 最新版本。若从较早版本升级，自 2.0.0 起 `steps` 表已添加三列：
+
+  | 列 | 自版本 | 迁移指南 |
+  |--------|-------|-----------------|
+  | `command` | 2.1.0 | [迁移到 2.1.0](/guides/migration/2.1.0) |
+  | `defaultOpen` | 2.3.0 | [迁移到 2.3.0](/guides/migration/2.3.0) |
+  | `modes` | 2.9.4 | [迁移到 2.9.4](/guides/migration/2.9.4) |
+</Warning>
+
+以下是用于创建此数据层 schema 的 SQL：
+
+```sql
+CREATE TABLE users (
+    "id" UUID PRIMARY KEY,
+    "identifier" TEXT NOT NULL UNIQUE,
+    "metadata" JSONB NOT NULL,
+    "createdAt" TEXT
+);
+
+CREATE TABLE IF NOT EXISTS threads (
+    "id" UUID PRIMARY KEY,
+    "createdAt" TEXT,
+    "name" TEXT,
+    "userId" UUID,
+    "userIdentifier" TEXT,
+    "tags" TEXT[],
+    "metadata" JSONB,
+    FOREIGN KEY ("userId") REFERENCES users("id") ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS steps (
+    "id" UUID PRIMARY KEY,
+    "name" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
+    "threadId" UUID NOT NULL,
+    "parentId" UUID,
+    "streaming" BOOLEAN NOT NULL,
+    "waitForAnswer" BOOLEAN,
+    "isError" BOOLEAN,
+    "metadata" JSONB,
+    "tags" TEXT[],
+    "input" TEXT,
+    "output" TEXT,
+    "createdAt" TEXT,
+    "command" TEXT,
+    "start" TEXT,
+    "end" TEXT,
+    "generation" JSONB,
+    "showInput" TEXT,
+    "language" TEXT,
+    "indent" INT,
+    "defaultOpen" BOOLEAN,
+    "modes" JSONB,
+    FOREIGN KEY ("threadId") REFERENCES threads("id") ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS elements (
+    "id" UUID PRIMARY KEY,
+    "threadId" UUID,
+    "type" TEXT,
+    "url" TEXT,
+    "chainlitKey" TEXT,
+    "name" TEXT NOT NULL,
+    "display" TEXT,
+    "objectKey" TEXT,
+    "size" TEXT,
+    "page" INT,
+    "language" TEXT,
+    "forId" UUID,
+    "mime" TEXT,
+    "props" JSONB,
+    FOREIGN KEY ("threadId") REFERENCES threads("id") ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS feedbacks (
+    "id" UUID PRIMARY KEY,
+    "forId" UUID NOT NULL,
+    "threadId" UUID NOT NULL,
+    "value" INT NOT NULL,
+    "comment" TEXT,
+    FOREIGN KEY ("threadId") REFERENCES threads("id") ON DELETE CASCADE
+);
+```
+
+## 示例
+
+以下是在 PostgreSQL 数据库上使用 Azure 存储客户端设置此数据层的示例。首先安装所需依赖：
+
+```bash
+pip install asyncpg SQLAlchemy azure-identity azure-storage-file-datalake aiohttp greenlet
+```
+
+导入自定义数据层和存储客户端，并在 Chainlit 应用开头使用 `@cl.data_layer` 指定要使用的数据层：
+
+```python
+import chainlit as cl
+from chainlit.data.sql_alchemy import SQLAlchemyDataLayer
+from chainlit.data.storage_clients.azure import AzureStorageClient
+
+storage_client = AzureStorageClient(account_url="<your_account_url>", container="<your_container>")
+
+@cl.data_layer
+def get_data_layer():
+    return SQLAlchemyDataLayer(conninfo="<your conninfo>", storage_provider=storage_client)
+```
+
+注意需要在 `conninfo` 字符串的协议中添加 `+asyncpg`，以使用 asyncpg 库。

@@ -1,0 +1,117 @@
+---
+title: "安全 - PII"
+---
+
+构建聊天应用时，确保敏感数据（尤其是个人可识别信息 PII）的安全处理至关重要。PII 可直接或间接关联到个人，因此通过阻止此类数据传输到语言模型来保护用户隐私非常重要。
+
+### PII 示例
+
+考虑以下文本，其中 PII 已高亮：
+
+> Hello, my name is **John** and I live in **New York**.
+> My credit card number is **3782-8224-6310-005** and my phone number is **(212) 688-5500**.
+
+以下是匿名化版本：
+
+> Hello, my name is \<PERSON\> and I live in \<LOCATION\>. My credit card number is \<CREDIT_CARD\> and my phone number is \<PHONE_NUMBER\>.
+
+## 分析与匿名化数据
+
+在 Chainlit 应用中集成 [Microsoft Presidio](https://microsoft.github.io/presidio/) 以实现 robust 数据清理。
+
+```python Code Example
+import chainlit as cl
+
+@cl.on_message
+async def main(message: cl.Message):
+    # 注意消息按原样传递
+    response = await cl.Message(
+        content=f"已收到: {message.content}",
+    ).send()
+```
+
+继续之前，请确保已安装 PII 分析和匿名化所需的 Python 包。在终端运行以下命令安装：
+
+```shell
+pip install presidio-analyzer presidio-anonymizer spacy
+python -m spacy download en_core_web_lg
+```
+
+创建一个使用 Presidio Analyzer 检查传入文本中 PII 的 async 上下文管理器。可将其包含在主函数中，在处理消息前进行审查。
+检测到 PII 时，应向用户提供继续或取消操作的选项。使用 Chainlit 的消息系统实现此功能。
+
+```python Code Example
+from presidio_analyzer import AnalyzerEngine
+from contextlib import asynccontextmanager
+
+analyzer = AnalyzerEngine()
+
+@asynccontextmanager
+async def check_text(text: str):
+  pii_results = analyzer.analyze(text=text, language="en")
+
+  if pii_results:
+    response = await cl.AskActionMessage(
+      content="检测到 PII",
+      actions=[
+        cl.Action(name="continue", payload={"value": "continue"}, label="✅ 继续"),
+        cl.Action(name="cancel", payload={"value": "continue"}, label="❌ 取消"),
+      ],
+    ).send()
+
+    if response is None or response.get("payload").get("value") == "cancel":
+      raise InterruptedError
+
+  yield
+
+# ...
+
+@cl.on_message
+async def main(message: cl.Message):
+  async with check_text(message.content):
+    # 此块仅在用户点击「继续」时执行
+    response = await cl.Message(
+        content=f"已收到: {message.content}",
+    ).send()
+```
+
+若应用需要匿名化 PII，Presidio 也可以做到。修改 check_text 上下文管理器，在检测到 PII 时返回匿名化文本。
+
+```python Code Example
+from presidio_anonymizer import AnonymizerEngine
+
+anonymizer = AnonymizerEngine()
+
+@asynccontextmanager
+async def check_text(text: str):
+  pii_results = analyzer.analyze(text=text, language="en")
+
+  if pii_results:
+    response = await cl.AskActionMessage(
+      content="检测到 PII",
+      actions=[
+        cl.Action(name="continue", payload={"value": "continue"}, label="✅ 继续"),
+        cl.Action(name="cancel", payload={"value": "continue"}, label="❌ 取消"),
+      ],
+    ).send()
+
+    if response is None or response.get("payload").get("value") == "cancel":
+      raise InterruptedError
+
+    yield anonymizer.anonymize(
+      text=text,
+      analyzer_results=pii_results,
+    ).text
+  else:
+    yield text
+
+# ...
+
+@cl.on_message
+async def main(message: cl.Message):
+  async with check_text(message.content) as anonymized_message:
+    response = await llm_chain.arun(
+      anonymized_message
+      callbacks=[cl.AsyncLangchainCallbackHandler()]
+    )
+```

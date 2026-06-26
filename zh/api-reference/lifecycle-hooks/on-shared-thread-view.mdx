@@ -1,0 +1,94 @@
+---
+title: "on_shared_thread_view"
+---
+
+用于在共享（只读）会话线程展示给其他已认证用户之前进行授权，并可选择性地清理内容的装饰器。
+
+需要满足以下条件才能启用会话线程共享：
+
+- [身份认证](/authentication/overview)
+- [数据持久化](/data-persistence/overview)
+- 配置中 `allow_thread_sharing = true`（或通过 Chat Profile 覆盖）
+
+若缺少其中任意一项，此装饰器不会被调用。
+
+当以下**任一**条件成立时，会话线程即可被查看：
+
+- 回调返回 `True`，**或**
+- 会话线程元数据中 `is_shared = true`
+
+这意味着回调可以为尚未显式共享的会话线程授予访问权限（例如管理员用户）；反之，标记为已共享的会话线程即使未定义回调也可被查看。
+
+<Warning>
+  **2.8.1 版本行为变更：** 在 2.8.0 中，仅当回调返回 `True` **且** 元数据中 `is_shared` 为 `true` 时，会话线程才可查看。自 2.8.1 起，**任一**条件即可。这支持管理员访问任意会话线程等场景，而无需先将其标记为共享。
+</Warning>
+
+此钩子在每次尝试查看共享会话线程时运行。你可以就地修改 `thread` 字典以脱敏或过滤内容。
+
+## 用法
+
+```python
+import chainlit as cl
+from typing import Any, Dict
+
+
+@cl.on_shared_thread_view
+async def on_shared_thread_view(thread: Dict[str, Any], current_user: cl.User) -> bool:
+    # 若用户不在同一团队则拒绝
+    owner_team = thread.get("metadata", {}).get("team")
+    user_team = current_user.metadata.get("team")
+    if owner_team != user_team:
+        return False
+
+    # 移除共享之后创建的消息（冻结在共享时刻）
+    shared_at = thread.get("metadata", {}).get("shared_at")
+    if shared_at:
+        thread["steps"] = [
+            s for s in thread.get("steps", []) if s.get("created_at") <= shared_at
+        ]
+
+    # 脱敏敏感输出
+    for step in thread.get("steps", []):
+        if step.get("metadata", {}).get("sensitive"):
+            step["output"] = "[REDACTED]"
+
+    return True
+```
+
+```python
+# 更简单的示例：若会话线程标记为已共享则允许
+@cl.on_shared_thread_view
+async def on_shared_thread_view(thread, current_user: cl.User) -> bool:
+    return bool(thread.get("metadata", {}).get("is_shared"))
+```
+
+## 参数
+
+<ParamField path="thread" type="ThreadDict">
+  序列化后的会话线程（包含消息/步骤、元素和 `metadata`）。可就地修改以清理内容。
+</ParamField>
+
+<ParamField path="current_user" type="User">
+  请求访问共享会话线程的已认证用户。
+</ParamField>
+
+## 返回值
+
+返回 `True` 以允许返回已清理（或未修改）的会话线程。
+返回 `False`（或抛出异常）以拒绝访问，并返回 `404`（对请求者而言该会话线程不存在）。
+
+## 常见模式
+
+- 角色门控：无论团队如何，均允许管理员访问。
+- 过期：将 `shared_at` 与 `now()` 比较，超过指定时长后拒绝。
+- 部分可见：按时间戳或特定标签裁剪消息。
+- 脱敏：返回前使用正则表达式 scrub 个人身份信息（PII）。
+- 审计：记录每次成功访问（用户 ID、会话线程 ID、时间）。
+
+## 最小示例（允许全部）
+
+```python
+@cl.on_shared_thread_view
+async def on_shared_thread_view(thread, current_user: cl.User) -> bool:
+    return True  # 接受所有查看请求（仅用于演示）
+```

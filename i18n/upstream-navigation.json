@@ -1,0 +1,275 @@
+{
+  "tabs": [
+    {
+      "tab": "文档",
+      "groups": [
+        {
+          "group": "快速开始",
+          "pages": [
+            "zh/get-started/overview",
+            "zh/get-started/installation",
+            "zh/get-started/pure-python",
+            {
+              "group": "集成",
+              "pages": [
+                "integrations/fastapi",
+                "integrations/langchain",
+                "integrations/openai",
+                "integrations/semantic-kernel",
+                "integrations/mistralai",
+                "integrations/litellm",
+                "integrations/llama-index",
+                "integrations/embedchain",
+                "integrations/message-based"
+              ]
+            }
+          ]
+        },
+        {
+          "group": "部署",
+          "pages": [
+            "deploy/overview",
+            {
+              "group": "平台",
+              "pages": [
+                "deploy/webapp",
+                {
+                  "group": "React",
+                  "pages": [
+                    "deploy/react/overview",
+                    "deploy/react/installation-and-setup",
+                    "deploy/react/usage",
+                    "deploy/react/additional-resources"
+                  ]
+                },
+                "deploy/copilot",
+                "deploy/teams",
+                "deploy/slack",
+                "deploy/discord"
+              ]
+            }
+          ]
+        },
+        {
+          "group": "基础概念",
+          "pages": [
+            "zh/concepts/chat-lifecycle",
+            "zh/concepts/starters",
+            "zh/concepts/message",
+            "zh/concepts/step",
+            "zh/concepts/user-session",
+            "zh/concepts/element",
+            "zh/concepts/action",
+            "zh/concepts/command",
+            "zh/concepts/modes"
+          ]
+        },
+        {
+          "group": "高级功能",
+          "pages": [
+            "advanced-features/streaming",
+            "advanced-features/mcp",
+            "advanced-features/ask-user",
+            "advanced-features/multi-modal",
+            "advanced-features/chat-profiles",
+            "advanced-features/chat-settings",
+            "advanced-features/test-debug"
+          ]
+        },
+        {
+          "group": "数据持久化",
+          "pages": [
+            "data-persistence/overview",
+            "data-persistence/history",
+            "data-persistence/feedback",
+            {
+              "group": "开源数据层",
+              "pages": [
+                "data-layers/overview",
+                "data-layers/official",
+                "data-layers/sqlalchemy",
+                "data-layers/dynamodb"
+              ]
+            },
+            "data-persistence/tags-metadata"
+          ]
+        },
+        {
+          "group": "身份认证",
+          "pages": [
+            "authentication/overview",
+            "authentication/password",
+            "authentication/header",
+            "authentication/oauth"
+          ]
+        },
+        {
+          "group": "自定义",
+          "pages": [
+            "customisation/overview",
+            "customisation/translation",
+            "customisation/avatars",
+            "customisation/custom-logo-and-favicon",
+            "customisation/theme",
+            "customisation/custom-js",
+            "customisation/custom-css"
+          ]
+        },
+        {
+          "group": "后端",
+          "pages": [
+            {
+              "group": "配置",
+              "pages": [
+                "backend/config/overview",
+                "backend/config/project",
+                "backend/config/features",
+                "backend/config/ui"
+              ]
+            },
+            "backend/env-variables",
+            "backend/command-line"
+          ]
+        },
+        {
+          "group": "指南",
+          "pages": [
+            "guides/sync-async"
+          ]
+        },
+        {
+          "group": "迁移指南",
+          "pages": [
+            "guides/migration/2.9.4",
+            "guides/migration/2.3.0",
+            "guides/migration/2.1.0",
+            "guides/migration/2.0.0",
+            "guides/migration/1.1.404",
+            "guides/migration/1.1.400",
+            "guides/migration/1.1.300",
+            "guides/migration/1.1.0",
+            "guides/migration/1.0.500"
+          ]
+        }
+      ]
+    },
+    {
+      "tab": "示例",
+      "groups": [
+        {
+          "group": "示例",
+          "pages": [
+            "examples/cookbook",
+            "examples/openai-sql",
+            "examples/qa",
+            "examples/security",
+            "examples/community"
+          ]
+        }
+      ]
+    },
+    {
+      "tab": "API 参考",
+      "groups": [
+        {
+          "group": "生命周期钩子",
+          "pages": [
+            "api-reference/lifecycle-hooks/on-chat-start",
+            "api-reference/lifecycle-hooks/on-chat-end",
+            "api-reference/lifecycle-hooks/on-chat-resume",
+            "api-reference/lifecycle-hooks/on-message",
+            "api-reference/lifecycle-hooks/on-logout",
+            "api-reference/lifecycle-hooks/on-audio-chunk",
+            "api-reference/lifecycle-hooks/on-audio-end"
+          ]
+        },
+        {
+          "group": "聊天",
+          "pages": [
+            "api-reference/message",
+            "api-reference/step-decorator",
+            "api-reference/step-class",
+            "api-reference/action",
+            "api-reference/chat-profiles",
+            "api-reference/chat-settings"
+          ]
+        },
+        {
+          "group": "元素",
+          "pages": [
+            "api-reference/elements/custom",
+            "api-reference/elements/text",
+            "api-reference/elements/image",
+            "api-reference/elements/dataframe",
+            "api-reference/elements/file",
+            "api-reference/elements/pdf",
+            "api-reference/elements/audio",
+            "api-reference/elements/video",
+            "api-reference/elements/plotly",
+            "api-reference/elements/pyplot",
+            "api-reference/elements/tasklist"
+          ]
+        },
+        {
+          "group": "询问用户",
+          "pages": [
+            "api-reference/ask/ask-for-input",
+            "api-reference/ask/ask-for-file",
+            "api-reference/ask/ask-for-action",
+            "api-reference/ask/ask-for-element"
+          ]
+        },
+        {
+          "group": "集成",
+          "pages": [
+            "api-reference/integrations/langchain",
+            "api-reference/integrations/llamaindex"
+          ]
+        },
+        {
+          "group": "其他",
+          "pages": [
+            "api-reference/author-rename",
+            "api-reference/make-async",
+            "api-reference/cache",
+            {
+              "group": "数据持久化",
+              "pages": [
+                "api-reference/data-persistence/custom-data-layer"
+              ]
+            },
+            "api-reference/window-message"
+          ]
+        },
+        {
+          "group": "输入控件",
+          "pages": [
+            "api-reference/input-widgets/checkbox",
+            "api-reference/input-widgets/datepicker",
+            "api-reference/input-widgets/multiselect",
+            "api-reference/input-widgets/radiogroup",
+            "api-reference/input-widgets/select",
+            "api-reference/input-widgets/slider",
+            "api-reference/input-widgets/switch",
+            "api-reference/input-widgets/tags",
+            "api-reference/input-widgets/textinput"
+          ]
+        }
+      ]
+    }
+  ],
+  "global": {
+    "anchors": [
+      {
+        "anchor": "官方英文文档",
+        "href": "https://docs.chainlit.io",
+        "icon": "book-open"
+      },
+      {
+        "anchor": "Chainlit 帮助",
+        "href": "https://help.chainlit.io",
+        "icon": "comment"
+      }
+    ]
+  }
+}

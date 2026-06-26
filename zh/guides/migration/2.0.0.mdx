@@ -1,0 +1,54 @@
+---
+title: 迁移到 Chainlit v2.0.0
+---
+
+<Note>加入 Discord 获取实时更新：https://discord.gg/AzyvDHWARx</Note>
+
+## 更新 Chainlit
+
+通过将 Chainlit 更新到最新版本开始迁移：
+
+```bash
+pip install --upgrade chainlit
+```
+
+## 有哪些变化？
+
+Chainlit UI（包括 Copilot）已使用 Shadcn/Tailwind 完全重写。这带来多项优势：
+1. 代码库更简洁，更便于贡献。
+2. 启用了新的自定义元素功能。
+3. 主题定制更强大。
+
+完整变更日志见[此处](https://github.com/Chainlit/chainlit/blob/main/CHANGELOG.md#200---2025-01-06)。
+
+## 如何迁移？
+
+### 1. 重新生成配置文件
+
+以下字段已从 `config.toml` 文件中移除：
+
+1. **follow_symlink**：Chainlit 不再使用 `StaticFiles` 提供文件服务。
+2. **font_family**、**custom_font**、**[UI.theme]**：主题定制现在使用[单独的文件](/customisation/theme)。
+2. **audio**：Chainlit 音频流已重构以匹配[实时 API](/advanced-features/multi-modal)。
+
+你可以手动移除这些字段，或删除 `.chainlit/config.toml` 文件并重启应用。
+
+### 2. Cookie 身份认证与跨域
+
+所有身份认证机制现在使用 cookie 身份认证，而不是直接使用 JWT。此变更使 Chainlit 更安全。
+
+应用代码无需任何更改。然而，这意味着 Chainlit 现在对跨域更严格（例如在网站上使用 Copilot 时）。
+
+若需要在不同来源消费 Chainlit 应用，请确保在 `config.toml` 的 `allow_origins` 中允许该来源。
+
+### 3. 操作
+
+1. **value** 字段已替换为 `payload`，接受 Python dict。这使操作更有用。
+2. **description** 字段已重命名为 `tooltip`。
+3. 添加了 `icon` 字段。可使用任意 lucide 图标名称。
+3. **collapsed** 字段已移除。
+
+### 4. Copilot 组件配置
+
+1. **fontFamily** 字段已移除。请参阅[新的自定义主题文档](/customisation/theme)。
+2. `button.style` 字段已替换为 `button.className`。可使用任意 tailwind 类来样式化组件按钮。

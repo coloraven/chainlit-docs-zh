@@ -1,0 +1,96 @@
+---
+title: Text to SQL
+---
+
+让我们构建一个简单的应用，帮助用户用自然语言创建 SQL 查询。
+
+<Frame caption="最终效果预览">
+  <video controls autoPlay loop muted src="/images/text-to-sql.mp4" />
+</Frame>
+
+## 前置条件
+
+此示例有额外依赖。可通过以下命令安装：
+
+```bash
+pip install chainlit openai
+```
+
+## 导入
+
+```python app.py
+from openai import AsyncOpenAI
+
+
+import chainlit as cl
+
+cl.instrument_openai()
+
+client = AsyncOpenAI(api_key="YOUR_OPENAI_API_KEY")
+```
+
+## 定义提示词模板和 LLM 设置
+
+````python app.py
+template = """SQL tables (and columns):
+* Customers(customer_id, signup_date)
+* Streaming(customer_id, video_id, watch_date, watch_minutes)
+
+A well-written SQL query that {input}:
+```"""
+
+
+settings = {
+    "model": "gpt-3.5-turbo",
+    "temperature": 0,
+    "max_tokens": 500,
+    "top_p": 1,
+    "frequency_penalty": 0,
+    "presence_penalty": 0,
+    "stop": ["```"],
+}
+````
+
+## 添加助手逻辑
+
+此处，我们用 [@on_message](/api-reference/lifecycle-hooks/on-message) 装饰器装饰 `main` 函数，告诉 Chainlit 在每次用户发送消息时运行 `main` 函数。
+
+然后，我们将 text to sql 逻辑包装在[步骤](/concepts/step)中。
+
+```python app.py
+@cl.set_starters
+async def starters():
+    return [
+       cl.Starter(
+           label="观看超过 50 分钟",
+           message="计算本月观看视频超过 50 分钟的客户数量。"
+       )
+    ]
+
+@cl.on_message
+async def main(message: cl.Message):
+    stream = await client.chat.completions.create(
+        messages=[
+            {
+                "role": "user",
+                "content": template.format(input=message.content),
+            }
+        ], stream=True, **settings
+    )
+
+    msg = await cl.Message(content="", language="sql").send()
+
+    async for part in stream:
+        if token := part.choices[0].delta.content or "":
+            await msg.stream_token(token)
+
+    await msg.update()
+```
+
+## 试用
+
+```bash
+chainlit run app.py -w
+```
+
+你可以提出类似 `Compute the number of customers who watched more than 50 minutes of video this month` 的问题。

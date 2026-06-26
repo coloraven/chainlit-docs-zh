@@ -1,0 +1,70 @@
+---
+title: "author_rename and Message author"
+---
+
+本文档介绍两种在 UI 中显示更友好作者名称的方法：设置或重命名消息作者——`author_rename` 装饰器，以及在创建消息时指定 Message author。
+
+## 方法一：author_rename
+
+适用于在消息处理过程中动态重命名消息作者。
+
+## 参数
+
+<ParamField path="orig_author" type="str" required>
+  原始作者名称。
+</ParamField>
+
+## 返回值
+
+<ResponseField name="author" type="str" required>
+  重命名后的作者
+</ResponseField>
+
+## 用法
+
+```python
+from langchain import OpenAI, LLMMathChain
+import chainlit as cl
+
+
+@cl.author_rename
+def rename(orig_author: str):
+    rename_dict = {"LLMMathChain": "Albert Einstein", "Chatbot": "Assistant"}
+    return rename_dict.get(orig_author, orig_author)
+
+
+@cl.on_message
+async def main(message: cl.Message):
+    llm = OpenAI(temperature=0)
+    llm_math = LLMMathChain.from_llm(llm=llm)
+    res = await llm_math.acall(message.content, callbacks=[cl.AsyncLangchainCallbackHandler()])
+
+    await cl.Message(content="Hello").send()
+```
+
+
+## 方法二：Message author
+
+允许在创建消息时指定消息作者。
+
+### 用法
+
+创建新消息对象时可直接指定 author：
+
+```python
+from langchain import OpenAI, LLMMathChain
+import chainlit as cl
+
+@cl.on_message
+async def main(message: cl.Message):
+    llm = OpenAI(temperature=0)
+    llm_math = LLMMathChain.from_llm(llm=llm)
+    res = await llm_math.acall(message.content, callbacks=[cl.AsyncLangchainCallbackHandler()])
+
+    # 在创建消息时指定 author
+    response_message = cl.Message(content="Hello", author="NewChatBotName")
+    await response_message.send()
+```
+
+
+

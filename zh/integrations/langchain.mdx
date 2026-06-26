@@ -1,0 +1,246 @@
+---
+title: LangChain/LangGraph
+---
+
+在本教程中，我们将逐步创建一个与 [LangChain](https://github.com/hwchase17/langchain) 集成的 Chainlit 应用。
+
+<Frame caption="预览：你将构建的内容">
+  <img src="/images/langchain-example.gif" />
+</Frame>
+
+## 前置条件
+
+开始之前，请确保你已具备：
+
+- 已正确安装 Chainlit
+- 已安装 LangChain 包
+- OpenAI API 密钥
+- 对 Python 编程有基本了解
+
+## 步骤 1：创建 Python 文件
+
+在项目目录中创建一个名为 `app.py` 的新 Python 文件。该文件将包含 LLM 应用的主要逻辑。
+
+## 步骤 2：编写应用逻辑
+
+在 `app.py` 中，导入必要的包，并定义一个处理新[聊天会话](/concepts/chat-lifecycle)的函数，以及另一个处理来自 UI 的[消息](/concepts/message)的函数。
+
+### 使用 LangChain
+
+让我们看一个小示例。
+
+<Note>
+  如果你的智能体/链没有 async 实现，请回退到 sync 实现。
+</Note>
+
+<CodeGroup>
+
+```python Async LCEL
+from langchain_openai import ChatOpenAI
+from langchain.prompts import ChatPromptTemplate
+from langchain.schema import StrOutputParser
+from langchain.schema.runnable import Runnable
+from langchain.schema.runnable.config import RunnableConfig
+from typing import cast
+
+import chainlit as cl
+
+
+@cl.on_chat_start
+async def on_chat_start():
+    model = ChatOpenAI(streaming=True)
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            (
+                "system",
+                "你是一位学识渊博的历史学家，能为历史问题提供准确且优美的回答。",
+            ),
+            ("human", "{question}"),
+        ]
+    )
+    runnable = prompt | model | StrOutputParser()
+    cl.user_session.set("runnable", runnable)
+
+
+@cl.on_message
+async def on_message(message: cl.Message):
+    runnable = cast(Runnable, cl.user_session.get("runnable"))  # type: Runnable
+
+    msg = cl.Message(content="")
+
+    async for chunk in runnable.astream(
+        {"question": message.content},
+        config=RunnableConfig(callbacks=[cl.LangchainCallbackHandler()]),
+    ):
+        await msg.stream_token(chunk)
+
+    await msg.send()
+```
+
+```python Sync LCEL
+from langchain_openai import ChatOpenAI
+from langchain.prompts import ChatPromptTemplate
+from langchain.schema import StrOutputParser
+from langchain.schema.runnable import Runnable
+from langchain.schema.runnable.config import RunnableConfig
+
+import chainlit as cl
+
+
+@cl.on_chat_start
+async def on_chat_start():
+    model = ChatOpenAI(streaming=True)
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            (
+                "system",
+                "你是一位学识渊博的历史学家，能为历史问题提供准确且优美的回答。",
+            ),
+            ("human", "{question}"),
+        ]
+    )
+    runnable = prompt | model | StrOutputParser()
+    cl.user_session.set("runnable", runnable)
+
+
+@cl.on_message
+async def on_message(message: cl.Message):
+    runnable = cl.user_session.get("runnable")  # type: Runnable
+
+    msg = cl.Message(content="")
+
+    for chunk in await cl.make_async(runnable.stream)(
+        {"question": message.content},
+        config=RunnableConfig(callbacks=[cl.LangchainCallbackHandler()]),
+    ):
+        await msg.stream_token(chunk)
+
+    await msg.send()
+```
+
+</CodeGroup>
+
+此代码为每个[聊天会话](/concepts/chat-lifecycle)设置一个带自定义 `ChatPromptTemplate` 的 `Runnable` 实例。每当用户发送[消息](/concepts/message)时，都会调用 `Runnable` 来生成响应。
+
+回调处理器负责监听链的中间[步骤](/concepts/step)，并将它们发送到 UI。
+
+### 使用 LangGraph
+
+```python
+from typing import Literal
+from langchain_core.tools import tool
+from langchain_openai import ChatOpenAI
+from langgraph.prebuilt import ToolNode
+from langchain.schema.runnable.config import RunnableConfig
+from langchain_core.messages import HumanMessage
+
+import chainlit as cl
+
+@tool
+def get_weather(city: Literal["nyc", "sf"]):
+    """使用此工具获取天气信息。"""
+    if city == "nyc":
+        return "纽约可能多云"
+    elif city == "sf":
+        return "旧金山总是阳光明媚"
+    else:
+        raise AssertionError("未知城市")
+
+
+tools = [get_weather]
+model = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0)
+final_model = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0)
+
+model = model.bind_tools(tools)
+# 注意：我们在此添加一个 tag，以便后续过滤模型流事件，仅保留最终节点中调用的模型。
+# 如果只调用单个 LLM，则不需要此步骤；但如果在节点内调用多个模型并只想过滤其中一个模型的事件，这可能很重要。
+final_model = final_model.with_config(tags=["final_node"])
+tool_node = ToolNode(tools=tools)
+
+from typing import Annotated
+from typing_extensions import TypedDict
+
+from langgraph.graph import END, StateGraph, START
+from langgraph.graph.message import MessagesState
+from langchain_core.messages import BaseMessage, SystemMessage, HumanMessage
+
+
+def should_continue(state: MessagesState) -> Literal["tools", "final"]:
+    messages = state["messages"]
+    last_message = messages[-1]
+    # 如果 LLM 发起了工具调用，则路由到 "tools" 节点
+    if last_message.tool_calls:
+        return "tools"
+    # 否则停止（回复用户）
+    return "final"
+
+
+def call_model(state: MessagesState):
+    messages = state["messages"]
+    response = model.invoke(messages)
+    # 返回列表，因为它会被添加到现有列表中
+    return {"messages": [response]}
+
+
+def call_final_model(state: MessagesState):
+    messages = state["messages"]
+    last_ai_message = messages[-1]
+    response = final_model.invoke(
+        [
+            SystemMessage("用 Al Roker 的口吻改写这段内容"),
+            HumanMessage(last_ai_message.content),
+        ]
+    )
+    # 覆盖来自智能体的最后一条 AI 消息
+    response.id = last_ai_message.id
+    return {"messages": [response]}
+
+
+builder = StateGraph(MessagesState)
+
+builder.add_node("agent", call_model)
+builder.add_node("tools", tool_node)
+# 添加独立的最终节点
+builder.add_node("final", call_final_model)
+
+builder.add_edge(START, "agent")
+builder.add_conditional_edges(
+    "agent",
+    should_continue,
+)
+
+builder.add_edge("tools", "agent")
+builder.add_edge("final", END)
+
+graph = builder.compile()
+
+@cl.on_message
+async def on_message(msg: cl.Message):
+    config = {"configurable": {"thread_id": cl.context.session.id}}
+    cb = cl.LangchainCallbackHandler()
+    final_answer = cl.Message(content="")
+    
+    for msg, metadata in graph.stream({"messages": [HumanMessage(content=msg.content)]}, stream_mode="messages", config=RunnableConfig(callbacks=[cb], **config)):
+        if (
+            msg.content
+            and not isinstance(msg, HumanMessage)
+            and metadata["langgraph_node"] == "final"
+        ):
+            await final_answer.stream_token(msg.content)
+
+    await final_answer.send()
+```
+
+## 步骤 3：运行应用
+
+要启动应用，请打开终端并导航到包含 `app.py` 的目录。然后运行以下命令：
+
+```bash
+chainlit run app.py -w
+```
+
+`-w` 标志会启用 Chainlit 的自动重载，因此你无需在每次修改应用后重启服务器。你的聊天机器人 UI 现在应可通过 http://localhost:8000 访问。
+
+<Warning>
+  使用 LangChain 时，提示词和补全默认不会被缓存。要启用缓存，请在 chainlit 配置文件中设置 `cache=true`。
+</Warning>

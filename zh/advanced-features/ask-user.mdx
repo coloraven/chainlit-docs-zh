@@ -1,0 +1,70 @@
+---
+title: "询问用户"
+---
+
+Ask API 会提示用户输入。根据所用 API 的不同，用户输入可以是字符串、文件、选择操作或填写表单。
+
+在用户完成输入之前，用户界面和你的代码都会被阻塞。
+
+<Frame caption="Ask File 示例">
+  <img src="/images/ask-file.png" />
+</Frame>
+
+## 可用的 Ask API
+
+<CardGroup cols={2}>
+  <Card
+    title="文本输入"
+    icon="text"
+    color="#ea5a0c"
+    href="/api-reference/ask/ask-for-input"
+  >
+    向用户请求字符串输入。
+  </Card>
+  <Card
+    title="文件"
+    icon="file"
+    color="#0285c7"
+    href="/api-reference/ask/ask-for-file"
+  >
+    请求用户上传文件。
+  </Card>
+  <Card
+    title="操作"
+    icon="bolt"
+    color="#16a34a"
+    href="/api-reference/ask/ask-for-action"
+  >
+    请求用户选择一个操作。
+  </Card>
+  <Card
+    title="元素"
+    icon="square-check"
+    color="#9333ea"
+    href="/api-reference/ask/ask-for-element"
+  >
+    请求用户完成自定义表单。
+  </Card>
+</CardGroup>
+
+## 交互式同意门控表单
+
+`AskElementMessage` API 使智能体能够向用户发送交互式、需经用户同意的 UI 组件。此功能特别适用于：
+
+- **合规工作流**，需要用户明确同意
+- **数据审阅**场景，用户需要审阅并修改 AI 生成的数据
+- **表单填写**，预填值供用户确认
+- **审计追踪**，用于敏感操作
+
+流程如下：
+
+1. **智能体**调用需经同意的工具（例如费用记录 API）
+2. 后端向前端发送带有可编辑字段和超时的 **CustomElement**
+3. **用户**修改或确认预填值并提交
+4. 后端接收**更新后的 props**，并使用用户批准的数据继续执行工具调用
+
+此模式会阻塞后续聊天交互，直到收到用户输入，从而避免模糊或未授权的操作。
+
+<Frame caption="Ask Element 示例">
+  <img src="/images/ask-element.png" />
+</Frame>

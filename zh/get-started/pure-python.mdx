@@ -1,0 +1,68 @@
+---
+title: 纯 Python
+---
+
+在本教程中，我们将逐步创建一个最小的 LLM 应用。
+
+## 前置条件
+
+开始之前，请确保你已具备：
+
+- 已正确安装 Chainlit
+- 对 Python 编程有基本了解
+
+## 步骤 1：创建 Python 文件
+
+在项目目录中创建一个名为 `app.py` 的新 Python 文件。该文件将包含 LLM 应用的主要逻辑。
+
+## 步骤 2：编写应用逻辑
+
+在 `app.py` 中，导入 Chainlit 包并定义一个处理来自聊天机器人 UI 消息的函数。使用 `@cl.on_message` 装饰器装饰该函数，以确保每当用户输入消息时都会调用它。
+
+脚本的基本结构如下：
+
+```python app.py
+import chainlit as cl
+
+
+@cl.on_message
+async def main(message: cl.Message):
+    # 自定义逻辑写在这里...
+
+    # 向用户发送响应
+    await cl.Message(
+        content=f"已收到: {message.content}",
+    ).send()
+```
+
+每当用户在聊天机器人 UI 中输入消息时，都会调用 `main` 函数。你可以在该函数中编写自定义逻辑来处理用户输入，例如分析文本、调用 API 或计算结果。
+
+[Message](/api-reference/message) 类负责向用户发送回复。在本示例中，我们仅发送一条包含用户输入的消息。
+
+## 步骤 3：运行应用
+
+要启动 Chainlit 应用，请打开终端并导航到包含 `app.py` 的目录。然后运行以下命令：
+
+```bash
+chainlit run app.py -w
+```
+
+`-w` 标志会启用 Chainlit 的自动重载，因此你无需在每次修改应用后重启服务器。你的聊天机器人 UI 现在应可通过 http://localhost:8000 访问。
+
+![PythonExample](/images/python-example.png)
+
+## 下一步
+
+<CardGroup cols={2}>
+  <Card title="概念" icon="lightbulb" color="#ea5a0c" href="/concepts">
+    了解 Chainlit 的核心概念
+  </Card>
+  <Card
+    title="Cookbook"
+    icon="book"
+    color="#0285c7"
+    href="https://github.com/Chainlit/cookbook"
+  >
+    浏览 Chainlit cookbook 获取更多示例
+  </Card>
+</CardGroup>

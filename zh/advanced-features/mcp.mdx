@@ -1,0 +1,197 @@
+---
+title: "MCP"
+description: 模型控制协议（MCP）允许你将外部工具提供方与 Chainlit 应用集成。这使 AI 模型能够通过标准化接口使用工具。
+---
+
+## 概览
+
+MCP 提供一种机制，使 Chainlit 应用能够连接到基于服务器发送事件（SSE）或 Streamable HTTP 的服务，或基于命令行（stdio）的工具。连接后，应用可以发现可用工具、执行工具，并将响应集成到应用流程中。
+
+ <Card
+    title="Chainlit MCP Cookbook"
+    icon="github"
+    href="https://github.com/Chainlit/cookbook/tree/main/mcp"
+  >
+    端到端 Cookbook 示例，展示 MCP 工具调用与 Claude 的配合使用。
+  </Card>
+
+<Frame caption="连接到 MCP 服务器">
+  <video
+    controls
+    autoPlay
+    loop
+    muted
+    src="https://github.com/user-attachments/assets/6119341f-fb5d-4c3f-9f10-735a74841fd6"
+  />
+</Frame>
+
+### 企业级 MCP 请联系我们
+
+我们正在与企业合作构建 MCP 技术栈，使 AI 智能体能够以标准化方式消费其数据与上下文。请填写此[表单](https://docs.google.com/forms/d/e/1FAIpQLSdObSIeIFt4nHppZ6r2rIoEe-jZRo4CqxbmRKKgb-ZsSPONnQ/viewform?usp=dialog)。
+
+## 连接类型
+
+| WebSockets | HTTP+SSE | Streamable HTTP | stdio |
+| ---------- | -------- | --------------- | ----- |
+| ❌         | ✅       | ✅              | ✅    |
+
+Chainlit 支持三种 MCP 连接类型：
+
+1. **SSE（服务器发送事件）**：通过 HTTP 连接到远程服务
+2. **Streamable HTTP**：向服务器发送 HTTP 请求并接收 JSON 响应，或使用 SSE 流连接
+3. **stdio**：执行本地命令并通过标准 I/O 通信
+
+> ⚠️ **安全警告**：stdio 连接类型会在 Chainlit 服务器上启动实际子进程。仅在受控环境中对可信命令使用此类型。确保对用户输入进行适当验证，以防止命令注入漏洞。
+
+<Note>**命令可用性警告**：使用 stdio 连接类型且命令为 `npx` 或 `uvx` 时，这些命令必须在运行 Chainlit 应用的服务器上可用。子进程在服务器上执行，而非客户端机器。</Note>
+
+### 服务端配置（`config.toml`）
+
+你可以通过修改项目的 `config.toml` 文件（通常位于项目根目录或 `.chainlit/config.toml`）全局控制启用的 MCP 连接类型，并限制允许的 stdio 命令。
+
+在 `[features.mcp]` 部分下，可以分别配置 SSE、Streamable HTTP 和 stdio：
+
+<Warning>
+  自 Chainlit 2.7.0 起，必须在 `config.toml` 中将 `mcp.enabled` 显式设置为 `true`。不再根据是否存在 `on_mcp_connect` 回调自动推断。
+</Warning>
+
+```toml
+[features]
+# ... 其他功能开关
+
+[features.mcp]
+    # 全局启用或禁用 MCP 功能
+    enabled = false
+
+[features.mcp.sse]
+    # 全局启用或禁用 SSE 连接类型
+    enabled = true
+
+[features.mcp.streamable-http]
+    # 全局启用或禁用 Streamable HTTP 连接类型
+    enabled = true
+
+[features.mcp.stdio]
+    # 全局启用或禁用 stdio 连接类型
+    enabled = true
+    # 为 stdio 类型定义可执行文件白名单。
+    # 只能使用此处列出的可执行文件基名。
+    # 这是 stdio 连接的关键安全措施。
+    # 示例：允许运行 `npx ...` 和 `uvx ...`，但阻止其他命令。
+    allowed_executables = [ "npx", "uvx" ]
+```
+
+## 设置
+
+### 1. 注册连接处理器
+
+要在 Chainlit 应用中使用 MCP，需要实现 `on_mcp_connect` 处理器。`on_mcp_disconnect` 处理器为可选，但建议实现以便正确清理。
+
+```python
+import chainlit as cl
+from mcp import ClientSession
+
+@cl.on_mcp_connect
+async def on_mcp_connect(connection, session: ClientSession):
+    """在建立 MCP 连接时调用"""
+    # 在此编写连接初始化代码
+    # 此处理器为 MCP 正常工作所必需
+    
+@cl.on_mcp_disconnect
+async def on_mcp_disconnect(name: str, session: ClientSession):
+    """在 MCP 连接终止时调用"""
+    # 在此编写清理代码
+    # 此处理器为可选
+```
+
+### 2. 客户端配置
+
+客户端需要通过 Chainlit 界面提供连接详情，包括：
+
+- 连接名称（唯一标识符）
+- 客户端类型（`sse`、`streamable-http` 或 `stdio`）
+- 对于 SSE 和 Streamable HTTP：URL 端点
+- 对于 stdio：完整命令（例如 `npx your-tool-package` 或 `uvx your-tool-package`）
+
+<Frame caption="添加 MCP">
+  <img src="/images/add-mcp.png" />
+</Frame>
+
+## 使用 MCP 连接
+
+### 获取可用工具
+
+连接建立后，可以发现 MCP 服务提供的可用工具：
+
+```python
+@cl.on_mcp_connect
+async def on_mcp(connection, session: ClientSession):
+    # 列出可用工具
+    result = await session.list_tools()
+    
+    # 处理工具元数据
+    tools = [{
+        "name": t.name,
+        "description": t.description,
+        "input_schema": t.inputSchema,
+    } for t in result.tools]
+    
+    # 存储工具供后续使用
+    mcp_tools = cl.user_session.get("mcp_tools", {})
+    mcp_tools[connection.name] = tools
+    cl.user_session.set("mcp_tools", mcp_tools)
+```
+
+### 执行工具
+
+可以使用 MCP 会话执行工具：
+
+```python
+@cl.step(type="tool") 
+async def call_tool(tool_use):
+    tool_name = tool_use.name
+    tool_input = tool_use.input
+    
+    # 查找适用于此工具的 MCP 连接
+    mcp_name = find_mcp_for_tool(tool_name)
+    
+    # 获取 MCP 会话
+    mcp_session, _ = cl.context.session.mcp_sessions.get(mcp_name)
+    
+    # 调用工具
+    result = await mcp_session.call_tool(tool_name, tool_input)
+    
+    return result
+```
+
+## 与 LLM 集成
+
+MCP 工具可与支持工具调用的 LLM 无缝集成：
+
+```python
+async def call_model_with_tools():
+    # 从所有 MCP 连接获取工具
+    mcp_tools = cl.user_session.get("mcp_tools", {})
+    all_tools = [tool for connection_tools in mcp_tools.values() for tool in connection_tools]
+    
+    # 使用工具调用 LLM
+    response = await your_llm_client.call(
+        messages=messages,
+        tools=all_tools
+    )
+    
+    # 如有需要，处理工具调用
+    if response.has_tool_calls():
+        # 处理工具调用
+        pass
+        
+    return response
+```
+
+## 会话管理
+
+MCP 连接在会话级别管理。每个 WebSocket 会话可以有多个具名 MCP 连接。连接在以下情况下会被清理：
+
+1. 用户显式断开连接
+2. 复用相同连接名称（旧连接被替换）
+3. WebSocket 会话结束

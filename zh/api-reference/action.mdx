@@ -1,0 +1,48 @@
+---
+title: "Action"
+---
+
+`Action` 类用于创建和管理要发送到聊天机器人用户界面并显示的操作。操作由用户可交互的按钮组成，这些交互会在你的应用中触发特定功能。
+
+## 属性
+
+<ParamField path="name" type="str">
+  操作的名称，应与操作回调匹配。
+</ParamField>
+
+<ParamField path="payload" type="Dict">
+  与操作关联的 payload。
+</ParamField>
+
+<ParamField path="icon" type="str" optional>
+  操作按钮的 Lucide 图标名称。参见 https://lucide.dev/icons/。
+</ParamField>
+
+<ParamField path="label" type="str" optional>
+  操作的标签，即用户看到的文本。若未提供 label 和 icon，则回退显示 name。
+</ParamField>
+
+<ParamField path="tooltip" type="str" optional>
+  操作的描述，用户悬停在操作上时会看到。
+</ParamField>
+
+## 用法
+
+```python
+import chainlit as cl
+
+@cl.action_callback("action_button")
+async def on_action(action):
+    await cl.Message(content=f"已执行 {action.name}").send()
+    # 可选：从聊天机器人用户界面移除操作按钮
+    await action.remove()
+
+@cl.on_chat_start
+async def start():
+    # 在聊天机器人消息中发送操作按钮
+    actions = [
+        cl.Action(name="action_button", payload={"value": "example_value"}, label="点我！")
+    ]
+
+    await cl.Message(content="与下面的操作按钮交互：", actions=actions).send()
+```

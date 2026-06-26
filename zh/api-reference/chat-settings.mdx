@@ -1,0 +1,253 @@
+---
+title: "聊天设置"
+---
+
+`ChatSettings` 类用于创建并向 UI 发送动态表单。用户可更新此表单。
+
+## 属性
+
+<ParamField path="inputs" type="List[InputWidget]">
+  表单字段。与 `tabs` 互斥——请使用其中一种。
+</ParamField>
+
+<ParamField path="tabs" type="List[Tab]">
+  将输入控件分组到命名标签页中。每个 `Tab` 包含 `id`、`label` 及其自身的 `inputs` 列表。
+  与顶层 `inputs` 列表互斥。
+</ParamField>
+
+## 方法
+
+### `send()`
+
+将设置表单发送到 UI，**并**将当前值提交到会话（`session.chat_settings`）。初始化设置时，或需要同时更新 UI 和已提交的会话状态时使用。
+
+### `refresh()`
+
+将设置表单推送到 UI，**但**不更新已提交的会话设置。在 `@cl.on_settings_edit` 内部使用时，可在不将编辑视为已确认变更的情况下动态更新可用控件（例如根据选择显示/隐藏字段）。
+
+<Note>
+  自 **2.11.0** 版本起。
+</Note>
+
+## 用法
+
+```python
+import chainlit as cl
+from chainlit.input_widget import Select, Switch, Slider
+
+
+@cl.on_chat_start
+async def start():
+    settings = await cl.ChatSettings(
+        [
+            Select(
+                id="Model",
+                label="OpenAI - Model",
+                values=["gpt-3.5-turbo", "gpt-3.5-turbo-16k", "gpt-4", "gpt-4-32k"],
+                initial_index=0,
+            ),
+            Switch(id="Streaming", label="OpenAI - Stream Tokens", initial=True),
+            Slider(
+                id="Temperature",
+                label="OpenAI - Temperature",
+                initial=1,
+                min=0,
+                max=2,
+                step=0.1,
+            ),
+            Slider(
+                id="SAI_Steps",
+                label="Stability AI - Steps",
+                initial=30,
+                min=10,
+                max=150,
+                step=1,
+                description="图像生成时执行的推理步数。",
+            ),
+            Slider(
+                id="SAI_Cfg_Scale",
+                label="Stability AI - Cfg_Scale",
+                initial=7,
+                min=1,
+                max=35,
+                step=0.1,
+                description="控制生成结果与提示词的匹配程度。",
+            ),
+            Slider(
+                id="SAI_Width",
+                label="Stability AI - Image Width",
+                initial=512,
+                min=256,
+                max=2048,
+                step=64,
+                tooltip="以像素为单位",
+            ),
+            Slider(
+                id="SAI_Height",
+                label="Stability AI - Image Height",
+                initial=512,
+                min=256,
+                max=2048,
+                step=64,
+                tooltip="以像素为单位",
+            ),
+        ]
+    ).send()
+
+
+@cl.on_settings_update
+async def setup_agent(settings):
+    print("on_settings_update", settings)
+
+```
+你也可以通过 `@` 和 `/` 命令组合访问 Chainlit 聊天设置。使用 `@` 可触发聊天设置的 **Select** 输入，使用 `/` 可选择当前设置项的输入值。
+
+### 单选类型
+<Frame caption="用户选择命令">
+  <img src="/images/chat-settings1.gif" />
+</Frame>
+
+### 多选类型
+<Frame caption="用户选择命令">
+  <img src="/images/chat-settings2.gif" />
+</Frame>
+
+## 动态控件刷新
+
+在 `@cl.on_settings_edit` 中使用 `refresh()`，可在用户编辑时动态更新表单，而无需将变更提交到会话。仅当用户确认（触发 `@cl.on_settings_update`）时，已提交的会话设置才会变更。
+
+```python
+import chainlit as cl
+from chainlit.input_widget import Select, Slider
+
+
+@cl.on_chat_start
+async def start():
+    await cl.ChatSettings(
+        [
+            Select(
+                id="Mode",
+                label="Mode",
+                values=["simple", "advanced"],
+                initial_index=0,
+            ),
+            Slider(
+                id="Temperature",
+                label="Temperature",
+                initial=0.7,
+                min=0,
+                max=2,
+                step=0.1,
+            ),
+        ]
+    ).send()
+
+
+@cl.on_settings_edit
+async def on_edit(settings):
+    inputs = [
+        Select(
+            id="Mode",
+            label="Mode",
+            values=["simple", "advanced"],
+            initial_value=settings["Mode"],
+        ),
+        Slider(
+            id="Temperature",
+            label="Temperature",
+            initial=settings.get("Temperature", 0.7),
+            min=0,
+            max=2,
+            step=0.1,
+        ),
+    ]
+    if settings["Mode"] == "advanced":
+        inputs.append(
+            Slider(
+                id="TopP",
+                label="Top P",
+                initial=settings.get("TopP", 0.9),
+                min=0,
+                max=1,
+                step=0.05,
+            )
+        )
+    await cl.ChatSettings(inputs).refresh()
+
+
+@cl.on_settings_update
+async def on_update(settings):
+    print("已确认的设置：", settings)
+```
+
+<Note>
+  自 **2.11.0** 版本起。
+</Note>
+
+## 标签页
+
+当设置项较多且分属不同类别时，可使用 `Tab` 将设置分组到命名标签页中。
+
+```python
+import chainlit as cl
+from chainlit.input_widget import Select, Slider, Tab
+
+
+@cl.on_chat_start
+async def start():
+    settings = await cl.ChatSettings(
+        tabs=[
+            Tab(
+                id="llm",
+                label="LLM",
+                inputs=[
+                    Select(
+                        id="Model",
+                        label="Model",
+                        values=["gpt-4o", "gpt-4o-mini", "gpt-4-turbo"],
+                        initial_index=0,
+                    ),
+                    Slider(
+                        id="Temperature",
+                        label="Temperature",
+                        initial=0.7,
+                        min=0,
+                        max=2,
+                        step=0.1,
+                    ),
+                ],
+            ),
+            Tab(
+                id="image",
+                label="Image",
+                inputs=[
+                    Slider(
+                        id="Width",
+                        label="Image Width",
+                        initial=512,
+                        min=256,
+                        max=2048,
+                        step=64,
+                    ),
+                    Slider(
+                        id="Height",
+                        label="Image Height",
+                        initial=512,
+                        min=256,
+                        max=2048,
+                        step=64,
+                    ),
+                ],
+            ),
+        ]
+    ).send()
+
+
+@cl.on_settings_update
+async def setup_agent(settings):
+    print("on_settings_update", settings)
+```
+
+<Note>
+  自 **2.9.1** 版本起。
+</Note>

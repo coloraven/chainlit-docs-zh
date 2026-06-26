@@ -1,0 +1,15 @@
+---
+title: "测试与调试"
+---
+
+要测试或调试应用文件和装饰器函数，你需要为测试套件提供 Chainlit 上下文。
+
+在主应用脚本或测试文件中添加：
+
+```
+if __name__ == "__main__":
+    from chainlit.cli import run_chainlit
+    run_chainlit(__file__)
+```
+
+然后在 IDE 中以调试模式运行该脚本。

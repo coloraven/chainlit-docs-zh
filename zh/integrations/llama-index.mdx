@@ -1,0 +1,107 @@
+---
+title: Llama Index
+---
+
+在本教程中，我们将引导你完成创建与 [Llama Index](https://github.com/jerryjliu/llama_index) 集成的 Chainlit 应用的步骤。
+
+<Frame caption="预览：你将构建的应用">
+  <img src="/images/llama-index-example.gif" />
+</Frame>
+
+## 前置条件
+
+开始之前，请确保你已具备：
+
+- 已正确安装 Chainlit
+- 已安装 Llama Index 包
+- OpenAI API 密钥
+- 对 Python 编程有基本了解
+
+## 步骤 1：设置数据目录
+
+在应用文件夹根目录创建一个名为 `data` 的文件夹。下载 [state of the union](https://github.com/Chainlit/cookbook/blob/main/llama-index/data/state_of_the_union.txt) 文件（或任意自选文件），并将其放入 `data` 文件夹。
+
+## 步骤 2：创建 Python 脚本
+
+在项目目录中创建一个名为 `app.py` 的新 Python 文件。该文件将包含 LLM 应用的主要逻辑。
+
+## 步骤 3：编写应用逻辑
+
+在 `app.py` 中，导入必要的包，并定义一个处理新[聊天会话](/concepts/chat-lifecycle)的函数，以及另一个处理来自 UI 的[消息](/concepts/message)的函数。
+
+在本教程中，我们将使用 `RetrieverQueryEngine`。以下是脚本的基本结构：
+
+```python app.py
+import os
+import openai
+import chainlit as cl
+
+from llama_index.core import (
+    Settings,
+    StorageContext,
+    VectorStoreIndex,
+    SimpleDirectoryReader,
+    load_index_from_storage,
+)
+from llama_index.llms.openai import OpenAI
+from llama_index.embeddings.openai import OpenAIEmbedding
+from llama_index.core.query_engine.retriever_query_engine import RetrieverQueryEngine
+from llama_index.core.callbacks import CallbackManager
+from llama_index.core.service_context import ServiceContext
+
+openai.api_key = os.environ.get("OPENAI_API_KEY")
+
+try:
+    # 重建 storage context
+    storage_context = StorageContext.from_defaults(persist_dir="./storage")
+    # 加载索引
+    index = load_index_from_storage(storage_context)
+except:
+    documents = SimpleDirectoryReader("./data").load_data(show_progress=True)
+    index = VectorStoreIndex.from_documents(documents)
+    index.storage_context.persist()
+
+
+@cl.on_chat_start
+async def start():
+    Settings.llm = OpenAI(
+        model="gpt-3.5-turbo", temperature=0.1, max_tokens=1024, streaming=True
+    )
+    Settings.embed_model = OpenAIEmbedding(model="text-embedding-3-small")
+    Settings.context_window = 4096
+
+    service_context = ServiceContext.from_defaults(callback_manager=CallbackManager([cl.LlamaIndexCallbackHandler()]))
+    query_engine = index.as_query_engine(streaming=True, similarity_top_k=2, service_context=service_context)
+    cl.user_session.set("query_engine", query_engine)
+
+    await cl.Message(
+        author="Assistant", content="你好！我是 AI 助手。有什么可以帮你的？"
+    ).send()
+
+
+@cl.on_message
+async def main(message: cl.Message):
+    query_engine = cl.user_session.get("query_engine") # type: RetrieverQueryEngine
+
+    msg = cl.Message(content="", author="Assistant")
+
+    res = await cl.make_async(query_engine.query)(message.content)
+
+    for token in res.response_gen:
+        await msg.stream_token(token)
+    await msg.send()
+```
+
+此代码为每个[聊天会话](/concepts/chat-lifecycle)设置一个 `RetrieverQueryEngine` 实例。每当用户发送[消息](/concepts/message)时，都会调用 `RetrieverQueryEngine` 来生成响应。
+
+回调处理器负责监听中间[步骤](/concepts/step)，并将它们发送到 UI。
+
+## 步骤 4：启动应用
+
+要启动 LLM 应用，请打开终端，导航到包含 `app.py` 的目录，并运行以下命令：
+
+```bash
+chainlit run app.py -w
+```
+
+`-w` 标志会启用自动重载，因此你无需在每次修改应用后重启服务器。你的聊天机器人 UI 现在应可通过 http://localhost:8000 访问。

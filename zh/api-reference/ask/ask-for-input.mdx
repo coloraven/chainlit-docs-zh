@@ -1,0 +1,43 @@
+---
+title: "AskUserMessage"
+---
+
+在继续执行之前向用户请求输入。
+如果用户未在指定时间内作答（见 `timeout`），将根据 `raise_on_timeout` 的设置抛出 `TimeoutError` 或返回 `None`。
+如果配置了项目 ID，消息将上传到云存储。
+
+### 属性
+
+<ParamField path="content" type="str">
+  消息内容。
+</ParamField>
+<ParamField path="author" type="str" optional default="config.ui.name">
+  消息作者，默认为你在配置中定义的聊天机器人名称。
+</ParamField>
+<ParamField path="timeout" type="int" optional default={60}>
+  等待用户作答的秒数，超时后将抛出 TimeoutError。
+</ParamField>
+<ParamField path="raise_on_timeout" type="bool" optional default={false}>
+  若用户未在指定时间内作答，是否抛出 socketio TimeoutError。
+</ParamField>
+
+### 返回值
+
+<ResponseField name="response" type="StepDict | None">
+  用户的响应。
+</ResponseField>
+
+### 用法
+
+```python
+import chainlit as cl
+
+
+@cl.on_chat_start
+async def main():
+    res = await cl.AskUserMessage(content="你叫什么名字？", timeout=10).send()
+    if res:
+        await cl.Message(
+            content=f"你的名字是：{res['output']}",
+        ).send()
+```

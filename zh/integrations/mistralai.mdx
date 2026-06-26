@@ -1,0 +1,68 @@
+---
+title: Mistral AI
+---
+
+<Warning>
+  如果你已经在使用 Langchain 或 LlamaIndex 等其他集成，则不应配置此集成。两个集成都会记录同一次生成，并在 UI 中创建重复的[步骤](/concepts/step)。
+</Warning>
+
+## 前置条件
+
+开始之前，请确保你已具备：
+
+- 已正确安装 Chainlit
+- 已安装 Mistral AI Python 客户端包 `mistralai`
+- [Mistral AI API 密钥](https://console.mistral.ai/api-keys/)
+- 对 Python 编程有基本了解
+
+## 步骤 1：创建 Python 文件
+
+在项目目录中创建一个名为 `app.py` 的新 Python 文件。该文件将包含 LLM 应用的主要逻辑。
+
+## 步骤 2：编写应用逻辑
+
+在 `app.py` 中，导入必要的包，并定义一个处理来自 UI 的[消息](/concepts/message)的函数。
+
+```python
+import os
+import chainlit as cl
+from mistralai import Mistral
+
+# 初始化 Mistral 客户端
+client = Mistral(api_key=os.getenv("MISTRAL_API_KEY"))
+
+@cl.on_message
+async def on_message(message: cl.Message):
+    response = await client.chat.complete_async(
+        model="mistral-small-latest",
+        max_tokens=100,
+        temperature=0.5,
+        stream=False,
+        # ... 更多设置
+        messages=[
+            {
+                "role": "system",
+                "content": "你是一个乐于助人的机器人，你总是用法语回复。"
+            },
+            {
+                "role": "user",
+                "content": message.content # 用户消息内容
+            }
+        ]
+    )
+    await cl.Message(content=response.choices[0].message.content).send()
+```
+
+## 步骤 3：填写环境变量
+
+在与 `app.py` 相同的文件夹中创建一个名为 `.env` 的文件。在 `MISTRAL_API_KEY` 变量中添加你的 Mistral AI API 密钥。
+
+## 步骤 4：运行应用
+
+要启动应用，请打开终端并导航到包含 `app.py` 的目录。然后运行以下命令：
+
+```bash
+chainlit run app.py -w
+```
+
+`-w` 标志会启用 Chainlit 的自动重载，因此你无需在每次修改应用后重启服务器。你的聊天机器人 UI 现在应可通过 http://localhost:8000 访问。

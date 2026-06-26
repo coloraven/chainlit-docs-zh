@@ -1,0 +1,746 @@
+{
+  "advanced-features/ask-user.mdx": {
+    "zh_path": "zh/advanced-features/ask-user.mdx",
+    "source_sha": "f28dc821cd74e1d665429517dccf8219f447dad566d3399adff19b1f8f247fdd",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "advanced-features/chat-profiles.mdx": {
+    "zh_path": "zh/advanced-features/chat-profiles.mdx",
+    "source_sha": "dda7d29b83afb198d757ebd627f236436e2d606be04f768af053103fc1d12877",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "advanced-features/chat-settings.mdx": {
+    "zh_path": "zh/advanced-features/chat-settings.mdx",
+    "source_sha": "eb9ff312b2431b82d3b68d845af566bb5d0b98538a56265aea524889771570ed",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "advanced-features/mcp.mdx": {
+    "zh_path": "zh/advanced-features/mcp.mdx",
+    "source_sha": "a97d230486c28d4681f1cdfade0fe5bb2a3db2df175c801522ff569c2e5aa386",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "advanced-features/multi-modal.mdx": {
+    "zh_path": "zh/advanced-features/multi-modal.mdx",
+    "source_sha": "bc71c82fdcc791d0c980e732156626814df81e4f6e3f24b0c2e4a1374c0f33b5",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "advanced-features/streaming.mdx": {
+    "zh_path": "zh/advanced-features/streaming.mdx",
+    "source_sha": "7fd9eed6f5d9fba737df5d86e63c73541bbc8fb359f7744ca3cd612270d6c3c5",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "advanced-features/test-debug.mdx": {
+    "zh_path": "zh/advanced-features/test-debug.mdx",
+    "source_sha": "6283f95f7c712786fd99a9e1c297797bc48064237df012fe1ccef67784204403",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/action.mdx": {
+    "zh_path": "zh/api-reference/action.mdx",
+    "source_sha": "7920ced271d3f85e9e9276f544ce81873b871830ceb4e4b24941579d18bf164b",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/ask/ask-for-action.mdx": {
+    "zh_path": "zh/api-reference/ask/ask-for-action.mdx",
+    "source_sha": "821d3b3c0a1c80c6febd4e0303c0df04572ea84296590f02ed9b42d4b984490e",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/ask/ask-for-element.mdx": {
+    "zh_path": "zh/api-reference/ask/ask-for-element.mdx",
+    "source_sha": "f70b6eb11a86f1f5f445d87bebad2db468597a4fdc65a8f8025660d0a3913346",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/ask/ask-for-file.mdx": {
+    "zh_path": "zh/api-reference/ask/ask-for-file.mdx",
+    "source_sha": "fa9ad479ebd939647bb413fe28389d37f295400a8f0ae273e42b8cac8aaec8e9",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/ask/ask-for-input.mdx": {
+    "zh_path": "zh/api-reference/ask/ask-for-input.mdx",
+    "source_sha": "9e9b7923c64360879509d9fd667fd05708dbe3e7599dd5882d16993497ffe177",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/author-rename.mdx": {
+    "zh_path": "zh/api-reference/author-rename.mdx",
+    "source_sha": "a9009bc454c3279de70a74fa2ec3ddc0f9642861e4e3e7a6b1247d9c5716da58",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/cache.mdx": {
+    "zh_path": "zh/api-reference/cache.mdx",
+    "source_sha": "16f53165c4eb37c78354a0b178636ebe048bd815d1cae5b268bb950fed7d6265",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/chat-profiles.mdx": {
+    "zh_path": "zh/api-reference/chat-profiles.mdx",
+    "source_sha": "eccf50db0443d85612e5212a0b37e3c794eb2dfb3cece770ebbbc2c380f11665",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/chat-settings.mdx": {
+    "zh_path": "zh/api-reference/chat-settings.mdx",
+    "source_sha": "414b76e092a3832684292605ee96d882df431adb45da91ddedefe176177f65bc",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/data-persistence/custom-data-layer.mdx": {
+    "zh_path": "zh/api-reference/data-persistence/custom-data-layer.mdx",
+    "source_sha": "eceee3bd28e2a07b087cad641a75d7c44008a0ad5bea67599ed1867b359098a2",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/elements/audio.mdx": {
+    "zh_path": "zh/api-reference/elements/audio.mdx",
+    "source_sha": "019b3d899d0878e11c376c4be5323a26d41b81152408db0269026349aff0e881",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/elements/custom.mdx": {
+    "zh_path": "zh/api-reference/elements/custom.mdx",
+    "source_sha": "eb1e5120cd6eedab6acf26782aff68e50e1834ba4c32e2339409967998fc0951",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/elements/dataframe.mdx": {
+    "zh_path": "zh/api-reference/elements/dataframe.mdx",
+    "source_sha": "3e12f8a4785a9425d53335d08994927d7443fef5601c4ddabf3d6685c5e554ab",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/elements/file.mdx": {
+    "zh_path": "zh/api-reference/elements/file.mdx",
+    "source_sha": "77f49ad20dd425f7403c222d1b1fbc4b893d701bc361fc62f878d4f952c0b74d",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/elements/image.mdx": {
+    "zh_path": "zh/api-reference/elements/image.mdx",
+    "source_sha": "c60073171903b1354077df2ba554b7a7e3325904624005d523a233f5cb9430f2",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/elements/pdf.mdx": {
+    "zh_path": "zh/api-reference/elements/pdf.mdx",
+    "source_sha": "9746f795767da2aa7678bd67e1abd609099ff1f51a9083e861b0e1320281b977",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/elements/plotly.mdx": {
+    "zh_path": "zh/api-reference/elements/plotly.mdx",
+    "source_sha": "dc1ab0284cbd4815d72a61fbbbf3e9552b5b9822903de5f1aa7e6d084faebdf8",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/elements/pyplot.mdx": {
+    "zh_path": "zh/api-reference/elements/pyplot.mdx",
+    "source_sha": "9f85a781859a4c2f0dbf44e0eac94c9f50eeaa802cd266a03e8a480a803148ab",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/elements/tasklist.mdx": {
+    "zh_path": "zh/api-reference/elements/tasklist.mdx",
+    "source_sha": "265825256efc098e46b064d6f5445de24f204b649bc482c50441663e908c403c",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/elements/text.mdx": {
+    "zh_path": "zh/api-reference/elements/text.mdx",
+    "source_sha": "fe6f226c80eb79d8d49efe5ae86daeae446af3b58fb4dd3b9ce92c463cfacc2c",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/elements/video.mdx": {
+    "zh_path": "zh/api-reference/elements/video.mdx",
+    "source_sha": "4845d5db7e1100770cec32a622920ae761efd33a596ef709248c9335d399f0e2",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/input-widgets/checkbox.mdx": {
+    "zh_path": "zh/api-reference/input-widgets/checkbox.mdx",
+    "source_sha": "09d7533eb31ff601e4edcf124bf055b4cf1c58760914642a13df700f3d349dd1",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/input-widgets/datepicker.mdx": {
+    "zh_path": "zh/api-reference/input-widgets/datepicker.mdx",
+    "source_sha": "473ff655c395671fb768b515b637255a4e45f78bfe2203a70ad9fe93cac100af",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/input-widgets/multiselect.mdx": {
+    "zh_path": "zh/api-reference/input-widgets/multiselect.mdx",
+    "source_sha": "4005cf4d587c3b5ebf77d807d83a03db4ffb08dd2b9d563752dce0f72b506036",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/input-widgets/radiogroup.mdx": {
+    "zh_path": "zh/api-reference/input-widgets/radiogroup.mdx",
+    "source_sha": "61adbf622df89f6603817bf374eb2e67f6f9f888b6cde1aa9b68456a9acac1a8",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/input-widgets/select.mdx": {
+    "zh_path": "zh/api-reference/input-widgets/select.mdx",
+    "source_sha": "568d248015dfd8ec4b65af135a3a362e8e046c738722fc39c98c0e0a20f0037a",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/input-widgets/slider.mdx": {
+    "zh_path": "zh/api-reference/input-widgets/slider.mdx",
+    "source_sha": "b68c27b75856028480684a2110f88f6eb9ad6d54d8e3002480fa67db6fb091e1",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/input-widgets/switch.mdx": {
+    "zh_path": "zh/api-reference/input-widgets/switch.mdx",
+    "source_sha": "b8a3969214a3742df42eefc238895b2d912e0f3c1af53f4adb5c7235279180fa",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/input-widgets/tags.mdx": {
+    "zh_path": "zh/api-reference/input-widgets/tags.mdx",
+    "source_sha": "cbe140d443eeba0d1df5fa6d354765c3424c99cbf2eccb412419155aba3e62a5",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/input-widgets/textinput.mdx": {
+    "zh_path": "zh/api-reference/input-widgets/textinput.mdx",
+    "source_sha": "ef47bb560ef2d3012e8570ab9077085615ee2bb65e89c38ebfcb23ac604a41ed",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/integrations/langchain.mdx": {
+    "zh_path": "zh/api-reference/integrations/langchain.mdx",
+    "source_sha": "680ccd007e556abbaea2abe965392a6d036d929d9a6a8d403561959140ca6d73",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/integrations/llamaindex.mdx": {
+    "zh_path": "zh/api-reference/integrations/llamaindex.mdx",
+    "source_sha": "2e2c65e17263b063c4731de9aca1da49d475f8291d9c53657faf9abdb182551c",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/lifecycle-hooks/on-audio-chunk.mdx": {
+    "zh_path": "zh/api-reference/lifecycle-hooks/on-audio-chunk.mdx",
+    "source_sha": "6c07d8380feca4e1c4efb3870c40bee8c76ea45d774b037d9507a02d05272287",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/lifecycle-hooks/on-audio-end.mdx": {
+    "zh_path": "zh/api-reference/lifecycle-hooks/on-audio-end.mdx",
+    "source_sha": "7b7c409db3fbb0a39673b76e492ab20231948977fc80158025cfbd7cc3a78c62",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/lifecycle-hooks/on-chat-end.mdx": {
+    "zh_path": "zh/api-reference/lifecycle-hooks/on-chat-end.mdx",
+    "source_sha": "276e4c478992643abc316a0e35d876ab13f5bbebdf7c58e27b846b2acdb00b95",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/lifecycle-hooks/on-chat-resume.mdx": {
+    "zh_path": "zh/api-reference/lifecycle-hooks/on-chat-resume.mdx",
+    "source_sha": "8d25001c0af3e27ff195b638f636ac58806e9b5bbdd876b7945b9f02a5bca9ae",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/lifecycle-hooks/on-chat-start.mdx": {
+    "zh_path": "zh/api-reference/lifecycle-hooks/on-chat-start.mdx",
+    "source_sha": "543c5f26e25fd5c733a003b44f3732e1ffcc2f1a5a5aab1aedb0f93d2e69633a",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/lifecycle-hooks/on-logout.mdx": {
+    "zh_path": "zh/api-reference/lifecycle-hooks/on-logout.mdx",
+    "source_sha": "7f27e9dbf9cfd51d83a15d21a866c3e5ef1776054f5817b5722a6b668c144633",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/lifecycle-hooks/on-message.mdx": {
+    "zh_path": "zh/api-reference/lifecycle-hooks/on-message.mdx",
+    "source_sha": "8cdeadfda01b448232e8c47815da1aef6c753ea732b64b615c6ebf15ea7f3bf9",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/lifecycle-hooks/on-shared-thread-view.mdx": {
+    "zh_path": "zh/api-reference/lifecycle-hooks/on-shared-thread-view.mdx",
+    "source_sha": "cc7e9ce4c63049d73fd74d8ab7393a7950c095c80a0366c6c833c6b7faf55688",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/make-async.mdx": {
+    "zh_path": "zh/api-reference/make-async.mdx",
+    "source_sha": "afb362b1ce9be018f38493ed4130f6dcee80b3d1a3fd062181cde22fc2f19df7",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/message.mdx": {
+    "zh_path": "zh/api-reference/message.mdx",
+    "source_sha": "cdf3569b7c2267f6f79a22611bfee7faed988e41d11c0bed705ec35af89b2204",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/step-class.mdx": {
+    "zh_path": "zh/api-reference/step-class.mdx",
+    "source_sha": "204b1cb85b39fc248f4ffd26f5a73f3d3e85bc2467d9b20c2647b34a973cc93e",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/step-decorator.mdx": {
+    "zh_path": "zh/api-reference/step-decorator.mdx",
+    "source_sha": "3d81bf28a5e5d2c26b667be7b2ab106058992704d6d96de1130575d3be950851",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "api-reference/window-message.mdx": {
+    "zh_path": "zh/api-reference/window-message.mdx",
+    "source_sha": "b6425bf63474b23d4738581b39ce22ca4c104b48e52fd12a161f4c2c1d4f932c",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "authentication/header.mdx": {
+    "zh_path": "zh/authentication/header.mdx",
+    "source_sha": "c6ccbdb985713a9935b5e5d04057b0c77844bdc0932fbd47f91be8785aca4f95",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "authentication/oauth.mdx": {
+    "zh_path": "zh/authentication/oauth.mdx",
+    "source_sha": "c707e5cb9823546bd24b61b0b34f368f8992feab536b97d790cce2064c3676ab",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "authentication/overview.mdx": {
+    "zh_path": "zh/authentication/overview.mdx",
+    "source_sha": "87bbaac3a8dd68713f061440470b2b11482cfd9961b41520684c7ffa0c199113",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "authentication/password.mdx": {
+    "zh_path": "zh/authentication/password.mdx",
+    "source_sha": "5faec24ea2185488f5605e049ffec43c4bb81a9c336b2320a03841a4cea138cb",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "backend/command-line.mdx": {
+    "zh_path": "zh/backend/command-line.mdx",
+    "source_sha": "6853d2bc92c849481862dbec1975dc35dd5b9e920c2b23cd416493bfd2488037",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "backend/config/features.mdx": {
+    "zh_path": "zh/backend/config/features.mdx",
+    "source_sha": "d2eac1ff54656b0bd4b8a6e9a048c6f58971f2b9911f1400373d9aab8061f580",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "backend/config/overview.mdx": {
+    "zh_path": "zh/backend/config/overview.mdx",
+    "source_sha": "34b15402c5f60a65e3064866455f150b5f720b739c8a024de2ffc02a66f48e8a",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "backend/config/project.mdx": {
+    "zh_path": "zh/backend/config/project.mdx",
+    "source_sha": "a706a7b929362ab79a077f582c317fab035e9ddc8bae40d1ff1ed0e04f68b647",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "backend/config/ui.mdx": {
+    "zh_path": "zh/backend/config/ui.mdx",
+    "source_sha": "4b37765a1ef47267aefb4d002aeb975add7751139bafc1ebb24b48f322071ba2",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "backend/env-variables.mdx": {
+    "zh_path": "zh/backend/env-variables.mdx",
+    "source_sha": "d493813d89b1f98440afc9a834922e60a7ff36d81aeefd9f2761edfed8913771",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "concepts/action.mdx": {
+    "zh_path": "zh/concepts/action.mdx",
+    "source_sha": "64b35ba3a212bf64f74e7b3ab0f2a2aff8782764d34b5f685cd2e169b3ac631d",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "concepts/chat-lifecycle.mdx": {
+    "zh_path": "zh/concepts/chat-lifecycle.mdx",
+    "source_sha": "bbcbe3f7a72b8e093268cdd13018530f4e1c0778353c623191d86b9ff300bf43",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "concepts/command.mdx": {
+    "zh_path": "zh/concepts/command.mdx",
+    "source_sha": "ce709c6152e5d1fc078ec99b406defaa315d8f81604f8434b7881762e80cd241",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "concepts/element.mdx": {
+    "zh_path": "zh/concepts/element.mdx",
+    "source_sha": "66310ce28252ff5970ad28aac26b8ce24a4f8575148be00c592d53d5d3781619",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "concepts/message.mdx": {
+    "zh_path": "zh/concepts/message.mdx",
+    "source_sha": "14edb246cedbb7f4d1ecd6c655004160f83c856383c04daa1236b9269d88c92d",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "concepts/modes.mdx": {
+    "zh_path": "zh/concepts/modes.mdx",
+    "source_sha": "3610aaf8b18b5d5f281cf0f437651a355ae6b3ca5ef7bf21d564e72e92bdf2ac",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "concepts/starters.mdx": {
+    "zh_path": "zh/concepts/starters.mdx",
+    "source_sha": "815c9402b43a14a7008f7e0c7569cce9d4b6ecec912e6fddf6a84e9226f6601e",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "concepts/step.mdx": {
+    "zh_path": "zh/concepts/step.mdx",
+    "source_sha": "862c54c2ff6ea753676de97477492c1abf151c0609c988653bba178f33552c16",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "concepts/user-session.mdx": {
+    "zh_path": "zh/concepts/user-session.mdx",
+    "source_sha": "d810793d31c114858d71931d3bdc687f9db8ba42ecdd8aa987efffacfda7ed17",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "customisation/avatars.mdx": {
+    "zh_path": "zh/customisation/avatars.mdx",
+    "source_sha": "f97ccec048e9de1925bfec8718a59b08e4e4a92820031d9e8d7e60f6dd1a0d24",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "customisation/custom-css.mdx": {
+    "zh_path": "zh/customisation/custom-css.mdx",
+    "source_sha": "d2997a41fdf1aa1a94775ce130704299b447207d5a36a49aa47b5197a0108b00",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "customisation/custom-js.mdx": {
+    "zh_path": "zh/customisation/custom-js.mdx",
+    "source_sha": "1a40e8901f53bd5571daea4cc8a5643cdd2a0b88a8c5d5b9e27acda2d540019b",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "customisation/custom-logo-and-favicon.mdx": {
+    "zh_path": "zh/customisation/custom-logo-and-favicon.mdx",
+    "source_sha": "57012b0d7d1719545e8ae297e1cf152dcd483020f165e91d3a27bc0f0c14106e",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "customisation/overview.mdx": {
+    "zh_path": "zh/customisation/overview.mdx",
+    "source_sha": "b1a19509432cde3865d9de44197a3c5bc5023580e0bad5d07896aae825cc18d9",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "customisation/theme.mdx": {
+    "zh_path": "zh/customisation/theme.mdx",
+    "source_sha": "cea41e8164a70dba3646fac78f41d4a10aba4f284d9ddc930f31d02fd4477545",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "customisation/translation.mdx": {
+    "zh_path": "zh/customisation/translation.mdx",
+    "source_sha": "45bfb3e90f9b24d74a697a3265b4004111ce139801ba7845f4ee274fc3236b64",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "data-layers/dynamodb.mdx": {
+    "zh_path": "zh/data-layers/dynamodb.mdx",
+    "source_sha": "e22d9318f815f29695a413b80aa15b59b58d182d4696f828542c897358d7e20a",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "data-layers/official.mdx": {
+    "zh_path": "zh/data-layers/official.mdx",
+    "source_sha": "9ee0402727f8725e469ec9ff18d9cf414e4cf0c20e123b2e154ac1545435d9b8",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "data-layers/overview.mdx": {
+    "zh_path": "zh/data-layers/overview.mdx",
+    "source_sha": "ec8e4fb29fd8dec3be77cd7c980a05d688088c72927a572b56d46da4e2f41bc6",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "data-layers/sqlalchemy.mdx": {
+    "zh_path": "zh/data-layers/sqlalchemy.mdx",
+    "source_sha": "a1e02a1799c104629c100fd1073242d8f19d854990677517e63189a160c639c1",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "data-persistence/feedback.mdx": {
+    "zh_path": "zh/data-persistence/feedback.mdx",
+    "source_sha": "ea9138f4d31fcc836b537cabd65eb7962ed7c9e2584612575417ef52628b6f7b",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "data-persistence/history.mdx": {
+    "zh_path": "zh/data-persistence/history.mdx",
+    "source_sha": "e687bf9fa0d3a98fc2fc13385a2d45c13696d3ed0194cd89d444dcb4b35eeffa",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "data-persistence/overview.mdx": {
+    "zh_path": "zh/data-persistence/overview.mdx",
+    "source_sha": "9a14edb4f76649c051ce3245b108722bf578d07fec4501377eeb62ef34f6c4c1",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "data-persistence/tags-metadata.mdx": {
+    "zh_path": "zh/data-persistence/tags-metadata.mdx",
+    "source_sha": "cc823602222decc83ab1d3dbdddf0fc718235beda55cbedb4f1eba5bb1146b20",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "deploy/copilot.mdx": {
+    "zh_path": "zh/deploy/copilot.mdx",
+    "source_sha": "e03a37d29feea44d992b999e48e96fbf2036a27da2af3eb0750be66cab330f2c",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "deploy/discord.mdx": {
+    "zh_path": "zh/deploy/discord.mdx",
+    "source_sha": "efeaf59952bd696c025849984024a09f1babae8470232b87b1122bfc888fbf33",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "deploy/overview.mdx": {
+    "zh_path": "zh/deploy/overview.mdx",
+    "source_sha": "68f66faebd4269436d781392713b1ef69192c2352f79a10b5f8bc6058bfe08d2",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "deploy/react/additional-resources.mdx": {
+    "zh_path": "zh/deploy/react/additional-resources.mdx",
+    "source_sha": "a88b3f5d36d4d93ab377fb2df0f9926e1a76b76c17ee0d399e26d5213fb88a20",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "deploy/react/installation-and-setup.mdx": {
+    "zh_path": "zh/deploy/react/installation-and-setup.mdx",
+    "source_sha": "f31da254ff953bac30e8de070519d742a1e567e4c5851a1484359293ca06010a",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "deploy/react/overview.mdx": {
+    "zh_path": "zh/deploy/react/overview.mdx",
+    "source_sha": "2b221265a22beaadfba29827955e02dab8752023f1a9b83d6c5060e6b6eeb53e",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "deploy/react/usage.mdx": {
+    "zh_path": "zh/deploy/react/usage.mdx",
+    "source_sha": "cceeee0ce0789cf7f90a61eb0bcaeaf8dc272045bb8ecb5fd8a7f4d3a87f13c1",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "deploy/slack.mdx": {
+    "zh_path": "zh/deploy/slack.mdx",
+    "source_sha": "d747e452d53410858a119aea361d0a3953798937687c75e54f8b5f517f8bcf89",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "deploy/teams.mdx": {
+    "zh_path": "zh/deploy/teams.mdx",
+    "source_sha": "917f6a9a5aabf04badaed41d8812ac58acdd31ab68b6f002d125576377ac51ff",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "deploy/webapp.mdx": {
+    "zh_path": "zh/deploy/webapp.mdx",
+    "source_sha": "9db81043467c19b17d8918dd626ee9eeac4f1ccee7ed8667747a5633295ca12f",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "examples/community.mdx": {
+    "zh_path": "zh/examples/community.mdx",
+    "source_sha": "f9c6cd050142994eda71153ea1b13652a215218092dfbfafa739001a21ad1ed4",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "examples/cookbook.mdx": {
+    "zh_path": "zh/examples/cookbook.mdx",
+    "source_sha": "ac77dfcc3530778d25bf538363ab4d0a1103a95c89ae2ffdf073eed35d091739",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "examples/openai-sql.mdx": {
+    "zh_path": "zh/examples/openai-sql.mdx",
+    "source_sha": "d0374206ba5b8e6c8c72f66b18f62bcd231b97bd183b80c3df402116ad1564fb",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "examples/qa.mdx": {
+    "zh_path": "zh/examples/qa.mdx",
+    "source_sha": "848566740d5c647f281376f6c0a845d342bb132c92eb11f266808800162e5472",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "examples/security.mdx": {
+    "zh_path": "zh/examples/security.mdx",
+    "source_sha": "43454fa8d22a60c05d62bd1fd472caedb4b2572d008cdcf1c4ed1f3c57b6cfcb",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "get-started/installation.mdx": {
+    "zh_path": "zh/get-started/installation.mdx",
+    "source_sha": "96cff75d88a9fea6da1d29629eb529b919341333d2df7744044baa4c0452d01d",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "get-started/overview.mdx": {
+    "zh_path": "zh/get-started/overview.mdx",
+    "source_sha": "cadbd0ce3bc1eb1a139d8c41f357b0c06d5ef962d90198200440e8f1d88be495",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "get-started/pure-python.mdx": {
+    "zh_path": "zh/get-started/pure-python.mdx",
+    "source_sha": "f0d812c3fcca8ac2490be54aafe622c668d137e95c2f237018f24e33a414e9f3",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "guides/iframe.mdx": {
+    "zh_path": "zh/guides/iframe.mdx",
+    "source_sha": "44c1165b211687420a3e078396c0df5413317a3a57d051ed6fdf2f99b683bded",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "guides/migration/1.0.500.mdx": {
+    "zh_path": "zh/guides/migration/1.0.500.mdx",
+    "source_sha": "26562f8344c184a1f804d84815f4ab4b1c73a91dedc55af9934229fb21cb1c9f",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "guides/migration/1.1.0.mdx": {
+    "zh_path": "zh/guides/migration/1.1.0.mdx",
+    "source_sha": "5ac22436f43c2fc804b3d18d2d367e8772180da5a7aee840d9d598f6c0591f10",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "guides/migration/1.1.300.mdx": {
+    "zh_path": "zh/guides/migration/1.1.300.mdx",
+    "source_sha": "403289d71bc8900b282c9ca6d9605075355457a9b5fba5f4644224e95e41dfce",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "guides/migration/1.1.400.mdx": {
+    "zh_path": "zh/guides/migration/1.1.400.mdx",
+    "source_sha": "b60cbdff7485eb165d1ef5bf36308674268fa98a53ab6e61081f07afbb46dfa8",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "guides/migration/1.1.404.mdx": {
+    "zh_path": "zh/guides/migration/1.1.404.mdx",
+    "source_sha": "ca71bbf9e6bbebc2e168386590976c7df2f005e9a7030e92702e4e7002d84558",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "guides/migration/2.0.0.mdx": {
+    "zh_path": "zh/guides/migration/2.0.0.mdx",
+    "source_sha": "50e156735047b0143bff6859c0d715ffbada8d5c226f562b576a7d0240d0586f",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "guides/migration/2.1.0.mdx": {
+    "zh_path": "zh/guides/migration/2.1.0.mdx",
+    "source_sha": "f261d60c867e534742caba26eac27807c831448d715c9a811a024179cc43a33c",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "guides/migration/2.3.0.mdx": {
+    "zh_path": "zh/guides/migration/2.3.0.mdx",
+    "source_sha": "a5a2ef11156bdbcab7c465459fd4e99a9bd44e6c5f96f35e50564204ece702cd",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "guides/migration/2.9.4.mdx": {
+    "zh_path": "zh/guides/migration/2.9.4.mdx",
+    "source_sha": "1e17edcac5c0a19bf535a31c681ab962d151c47715a78b115a9776153a8e90bf",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "guides/sync-async.mdx": {
+    "zh_path": "zh/guides/sync-async.mdx",
+    "source_sha": "81cdecd031fa8d3dc97e9a260fc408f36bc0b5a56e6de0fcbf7f27c79a703f26",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "integrations/embedchain.mdx": {
+    "zh_path": "zh/integrations/embedchain.mdx",
+    "source_sha": "406d2dd9ca2f76b55411635f8e78c6d3484f3abe818c244d09ddde415a17646a",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "integrations/fastapi.mdx": {
+    "zh_path": "zh/integrations/fastapi.mdx",
+    "source_sha": "20ea02a3a4a6bad0856418633d858a4ce8dcbd5bcd99d0ed382cd0930a4e3d92",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "integrations/langchain.mdx": {
+    "zh_path": "zh/integrations/langchain.mdx",
+    "source_sha": "5ef895ca3cdd44059e4187539daec91ba23256a46370c7fb1e4ea68127710540",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "integrations/litellm.mdx": {
+    "zh_path": "zh/integrations/litellm.mdx",
+    "source_sha": "6c59f69f6987d5a6ecec92c7b6bee5f464c3584fb44fc135a07506c55570b0a2",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "integrations/llama-index.mdx": {
+    "zh_path": "zh/integrations/llama-index.mdx",
+    "source_sha": "89eeff39e12532d0646011e7faa90148d7af2dc18cdcabab87514f4e4263579a",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "integrations/message-based.mdx": {
+    "zh_path": "zh/integrations/message-based.mdx",
+    "source_sha": "f572805197fdddf50f6e2da5ff9ed132dba42ac661e6896af9332586789b363f",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "integrations/mistralai.mdx": {
+    "zh_path": "zh/integrations/mistralai.mdx",
+    "source_sha": "1a947160a43e74946bb4f9564733810ef9d9f2050daeff6ec1c0e78b793d3195",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "integrations/openai.mdx": {
+    "zh_path": "zh/integrations/openai.mdx",
+    "source_sha": "fc6f95e02a1b57e4373868111391b1f4ed1e02cc04ca88907f7f3f9d7fe99bca",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  },
+  "integrations/semantic-kernel.mdx": {
+    "zh_path": "zh/integrations/semantic-kernel.mdx",
+    "source_sha": "961bd99e99f955da4448c1c7f1903e9d6e1bacc1bec2e5612e2e2b3bbda72dee",
+    "translated_at": "2026-06-26",
+    "status": "synced"
+  }
+}

@@ -1,0 +1,42 @@
+---
+title: Logo 与 Favicon
+---
+
+你可以使用自己的 logo 和 favicon 定制 Chainlit 应用。
+
+<Warning>
+  favicon 和 logo 等资源默认会被浏览器缓存。
+  可能需要清除浏览器缓存才能看到更改。
+</Warning>
+
+## 使用自定义 Logo
+
+Chainlit 应用支持深色和浅色模式。为此，请准备两个版本的 logo，分别命名为 `logo_dark.png` 和 `logo_light.png`。将这些 logo 放在应用旁边的 `/public` 文件夹中。重启应用后，应显示自定义 logo。
+
+<Card
+  title="自定义 Logo 示例"
+  color="#08947c"
+  icon="pied-piper-alt"
+  href="https://github.com/Chainlit/cookbook/tree/main/custom-logo"
+>
+  在 Chainlit 应用中使用自定义 logo 的实用示例。
+</Card>
+
+## 使用自定义 Favicon
+
+要进一步增强品牌效果，还可以更新应用的 favicon。在应用旁边的 `public` 文件夹中放置名为 `favicon` 的图像文件。重启应用后，新 favicon 将生效。
+
+## 定制登录页背景图
+
+若启用了身份认证，登录页会显示背景图（默认为 Chainlit logo）。
+你可以通过编辑 `.chainlit/config.toml` 文件的以下字段进行定制。
+
+```toml config.toml
+[UI]
+# 自定义登录页图像，相对于 public 目录或外部 URL
+login_page_image = "/public/custom-background.jpg"
+
+# 自定义登录页图像滤镜（Tailwind 内置滤镜，无深色/浅色变体）
+# login_page_image_filter = "brightness-50 grayscale"
+# login_page_image_dark_filter = "contrast-200 blur-sm"
+```

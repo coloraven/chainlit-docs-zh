@@ -1,0 +1,240 @@
+---
+title: OAuth
+---
+
+OAuth 允许你使用第三方服务对用户进行身份认证。
+
+<Note>
+  要启用 OAuth 提供方，你需要在代码中定义 OAuth 回调，并配置相应提供方的环境变量。
+</Note>
+
+## 提供方
+
+按照以下指南为你选择的提供方创建 OAuth 应用。然后将信息复制到对应的环境变量中以启用该提供方。
+
+<Warning>
+  若应用部署在反向代理之后（如 Cloud Run），需要设置 `CHAINLIT_URL` 环境变量。例如，若应用托管在 `https://mydomain.com`，则 `CHAINLIT_URL` 应设置为 `https://mydomain.com`。
+</Warning>
+
+### GitHub
+
+前往此页面[创建新的 GitHub OAuth 应用](https://github.com/settings/applications/new)。
+
+回调 URL 应为：`CHAINLIT_URL/auth/oauth/github/callback`。若 Chainlit 应用托管在 localhost:8000，应使用 `http://localhost:8000/auth/oauth/github/callback`。
+
+需要设置以下环境变量：
+
+- `OAUTH_GITHUB_CLIENT_ID`：Client ID
+- `OAUTH_GITHUB_CLIENT_SECRET`：Client secret
+
+### Gitlab
+
+前往此页面[创建新的 GitLab OAuth 应用](https://docs.gitlab.com/ee/integration/oauth_provider.html)。创建应用时，需要允许 `openid`、`profile` 和 `email` 作用域。
+
+回调 URL 应为：`CHAINLIT_URL/auth/oauth/gitlab/callback`。若 Chainlit 应用托管在 localhost:8000，应使用 `http://localhost:8000/auth/oauth/gitlab/callback`。
+
+需要设置以下环境变量：
+
+- `OAUTH_GITLAB_CLIENT_ID`：Client ID
+- `OAUTH_GITLAB_CLIENT_SECRET`：Client secret
+- `OAUTH_GITLAB_DOMAIN`：域名（不含协议）
+
+### Google
+
+前往此页面[创建新的 Google OAuth 应用](https://console.developers.google.com/apis/credentials)。
+
+回调 URL 应为：`CHAINLIT_URL/auth/oauth/google/callback`。若 Chainlit 应用托管在 localhost:8000，应使用 `http://localhost:8000/auth/oauth/google/callback`。
+
+需要设置以下环境变量：
+
+- `OAUTH_GOOGLE_CLIENT_ID`：Client ID
+- `OAUTH_GOOGLE_CLIENT_SECRET`：Client secret
+
+### Azure Active Directory
+
+按照此指南[创建新的 Azure Active Directory OAuth 应用](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app)。
+
+回调 URL 应为：`CHAINLIT_URL/auth/oauth/azure-ad/callback`。若 Chainlit 应用托管在 localhost:8000，应使用 `http://localhost:8000/auth/oauth/azure-ad/callback`。
+
+需要设置以下环境变量：
+
+- `OAUTH_AZURE_AD_CLIENT_ID`：Client ID
+- `OAUTH_AZURE_AD_CLIENT_SECRET`：Client secret
+- `OAUTH_AZURE_AD_TENANT_ID`：Azure 租户 ID
+
+可选环境变量：
+
+- `OAUTH_AZURE_AD_ENABLE_SINGLE_TENANT`：若应用支持「仅限此组织目录中的账户」（单租户），设置为 `true`。否则请勿设置此环境变量。
+- `OAUTH_AZURE_AD_SCOPES`：以空格分隔的 OAuth 作用域列表（默认：`https://graph.microsoft.com/User.Read offline_access`）。
+- `OAUTH_AZURE_AD_HYBRID_SCOPES`：混合流的作用域列表，以空格分隔（默认：`https://graph.microsoft.com/User.Read https://graph.microsoft.com/openid offline_access`）。
+
+<Note>
+  `OAUTH_AZURE_AD_SCOPES` 和 `OAUTH_AZURE_AD_HYBRID_SCOPES` 自版本 **2.11.0** 起可用。
+</Note>
+
+### Okta
+
+按照此指南[创建 OIDC 应用集成](https://help.okta.com/en-us/content/topics/apps/apps_app_integration_wizard_oidc.htm)。
+
+回调 URL 应为：`CHAINLIT_URL/auth/oauth/okta/callback`。若 Chainlit 应用托管在 localhost:8000，应使用 `http://localhost:8000/auth/oauth/okta/callback`。
+
+需要设置以下环境变量：
+
+- `OAUTH_OKTA_CLIENT_ID`：Client ID
+- `OAUTH_OKTA_CLIENT_SECRET`：Client secret
+- `OAUTH_OKTA_DOMAIN`：Okta 设置的域名，例如 https://company.okta.com
+
+配置 Okta OAuth 路由有几种方式：
+
+- 使用[单点登录到 Okta](https://developer.okta.com/docs/reference/api/oidc/#composing-your-base-url) 设置时，需要将 `OAUTH_OKTA_AUTHORIZATION_SERVER_ID` 环境变量设置为 `false`。
+- 将 Okta [作为应用或 API 的身份平台](https://developer.okta.com/docs/reference/api/oidc/#_2-okta-as-the-identity-platform-for-your-app-or-api) 时：
+  - 若有开发者账户，将 `OAUTH_OKTA_AUTHORIZATION_SERVER_ID` 环境变量设置为 `default`，
+  - 或将其设置为自定义授权服务器的 authorization server id。
+
+### Descope
+
+前往 [Descope 注册页面](https://www.descope.com/sign-up) 创建账户并设置身份认证。
+
+回调 URL 应为：`CHAINLIT_URL/auth/oauth/descope/callback`。若 Chainlit 应用托管在 localhost:8000，应使用 `http://localhost:8000/auth/oauth/descope/callback`。
+
+需要设置以下环境变量：
+
+- `OAUTH_DESCOPE_CLIENT_ID`：Descope 项目 ID，可在控制台的[项目设置](https://app.descope.com/settings/project)中找到。
+- `OAUTH_DESCOPE_CLIENT_SECRET`：Descope 访问密钥，可在控制台的[访问密钥](https://app.descope.com/accesskeys)中创建。
+
+### Auth0
+
+按照此指南[创建 Auth0 应用](https://auth0.com/docs/get-started/auth0-overview/create-applications)。
+
+回调 URL 应为：`CHAINLIT_URL/auth/oauth/auth0/callback`。若 Chainlit 应用托管在 localhost:8000，应使用 `http://localhost:8000/auth/oauth/auth0/callback`。
+
+需要设置以下环境变量：
+
+- `OAUTH_AUTH0_CLIENT_ID`：Client ID
+- `OAUTH_AUTH0_CLIENT_SECRET`：Client secret
+- `OAUTH_AUTH0_DOMAIN`：Auth0 设置的域名
+
+可选环境变量：
+
+- `OAUTH_AUTH0_ORIGINAL_DOMAIN`：若使用自定义域名，Auth0 的原始域名
+
+### Amazon Cognito
+
+按照此指南[创建新的 Amazon Cognito 用户池](https://docs.aws.amazon.com/cognito/latest/developerguide/tutorial-create-user-pool.html)。
+
+回调 URL 应为：`CHAINLIT_URL/auth/oauth/aws-cognito/callback`。若 Chainlit 应用托管在 localhost:8000，应使用 `http://localhost:8000/auth/oauth/aws-cognito/callback`。
+
+需要设置以下环境变量：
+
+- `OAUTH_COGNITO_CLIENT_ID`：Client ID
+- `OAUTH_COGNITO_CLIENT_SECRET`：Client secret
+- `OAUTH_COGNITO_DOMAIN`：Cognito 域名
+- `OAUTH_COGNITO_SCOPE`：访问级别
+
+### Keycloak
+
+按照此文档在 realm 中[创建新客户端](https://www.keycloak.org/docs/latest/server_admin/index.html#assembly-managing-clients_server_administration_guide)。
+
+你可以选择更改 Keycloak 提供方的 `id`，默认为 `keycloak`。若要在登录页显示更合适的名称，这很有用。使用 `OAUTH_KEYCLOAK_NAME` 环境变量设置名称。不要选择与任何其他 OAuth 提供方冲突的 `id`。
+
+客户端的回调 URL 应为：`CHAINLIT_URL/auth/oauth/${OAUTH_KEYCLOAK_NAME}/callback`。若 Chainlit 应用托管在 localhost:8000，应使用 `http://localhost:8000/auth/oauth/${OAUTH_KEYCLOAK_NAME}/callback`。
+
+需要设置以下环境变量：
+
+- `OAUTH_KEYCLOAK_CLIENT_ID`：Client ID
+- `OAUTH_KEYCLOAK_CLIENT_SECRET`：Client secret
+- `OAUTH_KEYCLOAK_REALM`：包含客户端的 realm。
+- `OAUTH_KEYCLOAK_BASE_URL`：Keycloak URL。
+- `OAUTH_KEYCLOAK_NAME`：可选，见上文。
+
+### 自定义提供方
+Chainlit 支持接入任意 OAuth 提供方。所需步骤：
+- 修改 runtime 中的 `providers` 变量
+- 实现 `CustomOAuthProvider(OAuthProvider)` 类，包含以下方法和字段：
+  - `get_token(self, code, url)`
+  - `get_user_info(self, token)`
+  - `authorize_params`
+  - `env`
+- 按 `env` 中的说明提供环境变量，例如：
+  - `YOUR_PROVIDER_CLIENT_ID`
+  - `YOUR_PROVIDER_CLIENT_SECRET`
+
+[此 Cookbook 示例](https://github.com/Chainlit/cookbook/tree/main/auth) 描述了具体做法，也可参考[基类](https://github.com/Chainlit/chainlit/blob/2cb38ad8596ac547355f87266bc15ab3dfd632d2/backend/chainlit/oauth_providers.py#L13)。
+
+## Prompt 配置
+
+<Note>
+  自版本 **1.3.0** 起。
+</Note>
+
+Chainlit 允许通过 `prompt` 参数配置 OAuth 提供方如何处理重新认证。这在用户登出后控制登录行为时特别有用。
+
+可使用两个环境变量配置此行为：
+- `OAUTH_PROMPT`：为所有 OAuth 提供方设置默认 prompt 行为
+- `OAUTH_<PROVIDER>_PROMPT`：为特定提供方设置 prompt 行为（例如 `OAUTH_GITHUB_PROMPT`）
+
+这些变量支持的值为：
+- `none`：无需交互（未设置时的默认值）
+- `login`：强制重新认证
+- `consent`：请求批准所请求的作用域
+- `select_account`：允许用户选择不同账户
+
+例如：
+```bash
+# 为所有提供方强制 consent prompt
+OAUTH_PROMPT=consent
+
+# 覆盖特定提供方以强制 login
+OAUTH_GITHUB_PROMPT=login
+```
+
+注意：不同 prompt 值的行为和支持可能因 OAuth 提供方而异。例如：
+- GitHub 对 `prompt=consent` 响应良好
+- 部分提供方（如 Descope）仅尊重 `prompt=login`
+
+此功能在以下场景特别有用：
+- 允许用户正确登出并切换账户
+- 出于安全目的强制重新认证
+- 让用户选择批准哪些作用域
+- 防止登出后自动重新认证
+
+prompt 参数在 OpenID Connect Core 1.0 规范中定义。更多技术细节请参阅 [OpenID Connect 文档](https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest)。
+
+## 示例
+
+### 允许所有通过 OAuth 身份认证的用户。
+
+```python
+from typing import Dict, Optional
+import chainlit as cl
+
+
+@cl.oauth_callback
+def oauth_callback(
+  provider_id: str,
+  token: str,
+  raw_user_data: Dict[str, str],
+  default_user: cl.User,
+) -> Optional[cl.User]:
+  return default_user
+```
+
+### 仅允许来自特定 Google 域的用户。
+
+```python
+from typing import Dict, Optional
+import chainlit as cl
+
+
+@cl.oauth_callback
+def oauth_callback(
+  provider_id: str,
+  token: str,
+  raw_user_data: Dict[str, str],
+  default_user: cl.User,
+) -> Optional[cl.User]:
+  if provider_id == "google":
+    if raw_user_data["hd"] == "example.org":
+      return default_user
+  return None
+```

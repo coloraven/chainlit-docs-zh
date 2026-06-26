@@ -1,0 +1,52 @@
+---
+title: 消息
+---
+
+消息（Message）是用户与助手之间互相发送的信息片段。
+结合生命周期钩子，消息是构成聊天的基本单元。
+
+消息包含内容、时间戳，且不能嵌套。
+
+## 示例：回复用户消息
+
+让我们创建一个简单的助手，用问候语回复用户消息。
+
+```py
+import chainlit as cl
+
+@cl.on_message
+async def on_message(message: cl.Message):
+    response = f"你好，你刚刚发送了：{message.content}！"
+    await cl.Message(response).send()
+```
+
+<Card
+  title="Message API"
+  icon="message"
+  color="#F80061"
+  href="/api-reference/message"
+>
+  了解更多 Message API 信息。
+</Card>
+
+## 聊天上下文
+
+由于 LLM 是无状态的，你通常需要将当前对话中的消息累积到一个列表中，以便在每次查询时为 LLM 提供完整上下文。
+
+你可以通过 [user_session](/concepts/user-session) 手动实现这一点。不过，Chainlit 提供了内置方式：
+
+```py chat_context
+import chainlit as cl
+
+@cl.on_message
+async def on_message(message: cl.Message):
+    # 获取 OpenAI 格式的对话消息
+    print(cl.chat_context.to_openai())
+
+    # 发送响应
+    response = f"你好，你刚刚发送了：{message.content}！"
+    await cl.Message(response).send()
+```
+
+每条发送或接收的消息都会自动累积到 `cl.chat_context` 中。
+然后你可以使用 `cl.chat_context.to_openai()` 获取 OpenAI 格式的对话内容，并将其提供给 LLM。

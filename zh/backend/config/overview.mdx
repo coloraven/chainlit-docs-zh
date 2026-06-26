@@ -1,0 +1,31 @@
+---
+title: "概览"
+---
+
+运行 `chainlit run ...` 或 `chainlit init` 时会创建 `.chainlit/config.toml` 文件。它允许你配置 Chainlit 应用并启用/禁用特定功能。
+
+你还可以在运行时通过聊天配置动态覆盖特定的 `config.toml` 变量。详情请参阅[基于配置的动态配置](/api-reference/lifecycle-hooks/on-profile-switch)。
+
+它由三个部分组成：
+
+<CardGroup cols={2}>
+  <Card
+    title="project"
+    icon="rocket-launch"
+    color="#ea5a0c"
+    href="/backend/config/project"
+  >
+    项目配置。
+  </Card>
+  <Card
+    title="features"
+    icon="flag"
+    color="#0285c7"
+    href="/backend/config/features"
+  >
+    启用/禁用功能。
+  </Card>
+  <Card title="UI" icon="palette" color="#16a34a" href="/backend/config/ui">
+    UI 配置。
+  </Card>
+</CardGroup>

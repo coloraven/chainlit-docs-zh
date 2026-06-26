@@ -1,0 +1,39 @@
+---
+title: "cache"
+---
+
+`cache` 装饰器用于缓存资源密集型计算或加载过程的结果。可与[文件监视器](/backend/command-line)配合使用，避免每次应用重启时重新加载资源。这不仅能节省时间，还能提升整体效率。
+
+## 参数
+
+<ParamField path="func" type="Callable">
+  需要缓存其结果的目标函数。
+</ParamField>
+
+## 返回值
+
+<ResponseField name="cached_value" type="Any" required>
+  首次计算后存储在缓存中的值。
+</ResponseField>
+
+## 用法
+
+```python
+import time
+import chainlit as cl
+
+@cl.cache
+def to_cache():
+    time.sleep(5)  # 模拟耗时过程
+    return "Hello!"
+
+value = to_cache()
+
+@cl.on_message
+async def main(message: cl.Message):
+    await cl.Message(
+        content=value,
+    ).send()
+```
+
+在此示例中，`to_cache` 函数模拟一个返回值的耗时过程。使用 `cl.cache` 装饰器后，函数结果在首次执行后会被缓存。后续调用 `to_cache` 函数将直接返回缓存值，而无需再次运行耗时过程。

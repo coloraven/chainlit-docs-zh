@@ -1,0 +1,27 @@
+---
+title: 迁移到 Chainlit v1.1.0
+---
+
+<Note>加入 Discord 获取实时更新：https://discord.gg/AzyvDHWARx</Note>
+
+## 更新 Chainlit
+
+通过将 Chainlit 更新到最新版本开始迁移：
+
+```bash
+pip install --upgrade chainlit
+```
+
+## 有哪些变化？
+
+完整变更日志见[此处](https://github.com/Chainlit/chainlit/blob/main/CHANGELOG.md#110---2024-05-13)。
+
+## 如何迁移？
+
+### 重命名 multi_modal 配置项
+
+`multi_modal` 配置项已重命名为 `spontaneous_file_upload`。你可以删除整个 `./chainlit/config.toml` 文件并重启应用，或手动重命名 `multi_modal` 设置（示例见[此处](/backend/config/features#default-configuration)）。
+
+<Warning>
+  cl.Message.send() 方法不再返回消息的 id，而是返回消息本身。若你使用了 id，需要更新代码。
+</Warning>

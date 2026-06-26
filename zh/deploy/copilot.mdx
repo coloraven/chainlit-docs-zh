@@ -1,0 +1,276 @@
+---
+title: Copilot
+---
+
+软件 Copilot 是一种嵌入到你应用/产品中的新型助手。它们旨在通过提供上下文指导和代用户执行[操作](/concepts/action)，帮助用户充分利用你的应用。
+
+<Frame caption="预览">
+  <img src="/images/copilot.gif" />
+</Frame>
+
+## 支持的功能
+
+| 消息 | 流式 | 元素 | 音频 | 询问用户 | 聊天历史 | 聊天配置 | 反馈 |
+| ------- | --------- | -------- | ----- | -------- | ------------ | ------------- | -------- |
+| ✅      | ✅        | ✅       | ✅    | ✅       | ✅           | ✅            | ✅       |
+
+## 嵌入 Copilot
+
+首先，确保 Chainlit 服务器正在运行。然后，在网站 `<body>` 标签末尾添加以下脚本：
+
+<Note>
+  此示例假设 Chainlit 服务器运行在
+  `http://localhost:8000`
+</Note>
+
+```html
+<head>
+  <meta charset="utf-8" />
+</head>
+<body>
+  <!-- ... -->
+  <script src="http://localhost:8000/copilot/index.js"></script>
+  <script>
+    window.addEventListener("chainlit-call-fn", (e) => {
+      const { name, args, callback } = e.detail;
+      callback("你已发送：" + args.msg);
+    });
+  </script>
+  <script>
+    window.mountChainlitWidget({
+      chainlitServer: "http://localhost:8000",
+    });
+  </script>
+</body>
+```
+
+<Warning>
+  请记住 HTML 文件必须由服务器提供，直接在浏览器中打开将无法工作。你可以使用简单的 HTTP 服务器进行测试。
+</Warning>
+
+就是这样！你现在应该能在网站右下角看到一个浮动按钮。点击它将打开 Copilot。
+
+你可以使用 `window.toggleChainlitCopilot()` 以编程方式切换 copilot。
+
+## 会话持久化
+
+Copilot 现在支持在浏览器 localStorage 中持久化存储 `threadId`，使页面重新加载后可以恢复聊天。此功能提供两个 JavaScript 实用函数来管理会话持久化：
+
+### getChainlitCopilotThreadId()
+
+从 localStorage 检索当前 threadId。
+
+**返回值：** `string | null` - 当前 threadId，未找到则返回 null
+
+```javascript
+const threadId = window.getChainlitCopilotThreadId();
+console.log("当前 thread ID：", threadId);
+```
+
+### clearChainlitCopilotThreadId(newThreadId?)
+
+清除 localStorage 中的现有 threadId。可选择设置新的 threadId。
+
+**参数：**
+- `newThreadId?`（可选）：`string` - 清除后设置的新 threadId
+
+```javascript
+// 以编程方式开始新线程
+window.clearChainlitCopilotThreadId();
+
+// 或使用预定义 ID
+const newThreadId = crypto.randomUUID();
+window.clearChainlitCopilotThreadId(newThreadId);
+```
+
+这些函数为开发者提供了对线程管理和 Copilot 体验中会话连续性的更大控制。
+
+## 组件配置
+
+`mountChainlitWidget` 函数接受以下选项：
+
+```ts
+export interface IWidgetConfig {
+  // Chainlit 服务器 URL
+  chainlitServer: string;
+  // 若服务器启用了身份认证，则为必填
+  accessToken?: string;
+  // Copilot 主题
+  theme?: "light" | "dark";
+  // 显示模式："floating" 弹出层（默认）或 "sidebar" 全高面板
+  displayMode?: "floating" | "sidebar";
+  // 应用于组件按钮的自定义样式
+  button?: {
+    // 挂载按钮的容器元素 ID
+    containerId?: string;
+    // 用作按钮图标的图片 URL
+    imageUrl?: string;
+    // 应用于按钮的 tailwind 类名
+    className?: string;
+  };
+  // Copilot 中的自定义 CSS 样式
+  customCssUrl?: string;
+  // 允许向 Chainlit 服务器的 API 请求传递额外查询参数
+  additionalQueryParamsForAPI?: Record<string, string>;
+  // 以展开状态启动组件容器（即宽屏模式）
+  expanded?: boolean;
+  // 设置 Chainlit UI 的语言
+  // 默认为用户的 preferred language（通过 navigator.language），否则为 en-US
+  language?: string;
+  // 以 Copilot 聊天面板打开状态启动
+  opened?: boolean;
+}
+```
+
+## 侧边栏模式
+
+默认情况下，copilot 渲染为浮动弹出层。将 `displayMode` 设置为 `"sidebar"` 可将其渲染为锚定到视口右边缘的全高侧边面板。面板会推开宿主页面内容以腾出空间，并在左边缘包含拖动手柄用于调整大小（最小 300 px，最大 50% 视口宽度）。
+
+用户可以通过 copilot 标题栏中的下拉菜单在侧边栏和浮动模式之间切换。所选模式和侧边栏宽度会在会话间持久化到 `localStorage`。`mountChainlitWidget()` 中显式设置的 `displayMode` 优先于存储的值。
+
+```js
+window.mountChainlitWidget({
+  chainlitServer: "http://localhost:8000",
+  displayMode: "sidebar",
+});
+```
+
+<Note>
+  自版本 **2.11.0** 起。
+</Note>
+
+## 函数调用
+
+Copilot 可以调用你网站上的函数。这对于代用户执行[操作](/concepts/action)非常有用。例如，你可以调用函数来创建新文档，或打开模态框。
+
+首先，在你的 Chainlit 服务器中创建一个 `CopilotFunction`：
+
+```py
+import chainlit as cl
+
+
+@cl.on_message
+async def on_message(msg: cl.Message):
+    if cl.context.session.client_type == "copilot":
+        fn = cl.CopilotFunction(name="test", args={"msg": msg.content})
+        res = await fn.acall()
+        await cl.Message(content=res).send()
+```
+
+然后，在你的应用/网站中，添加以下事件监听器：
+
+```js
+window.addEventListener("chainlit-call-fn", (e) => {
+  const { name, args, callback } = e.detail;
+  if (name === "test") {
+    console.log(name, args);
+    callback("你已发送：" + args.msg);
+  }
+});
+```
+
+如你所见，事件监听器接收函数名称、参数和回调函数。应使用函数调用的结果调用回调函数。
+
+## 发送消息
+
+Copilot 还可以直接向 Chainlit 服务器发送[消息](/concepts/message)。这对于向 Chainlit 服务器发送上下文信息或用户[操作](/concepts/action)很有用（例如用户在表格中从单元格 A1 选择了 B1）。
+
+首先，更新 Chainlit 服务器上的 `@cl.on_message` 装饰函数：
+
+```py
+import chainlit as cl
+
+
+@cl.on_message
+async def on_message(msg: cl.Message):
+    if cl.context.session.client_type == "copilot":
+
+        if msg.type == "system_message":
+          # do something with the message
+          return
+
+        fn = cl.CopilotFunction(name="test", args={"msg": msg.content})
+        res = await fn.acall()
+        await cl.Message(content=res).send()
+```
+
+然后，在你的应用/网站中，可以像这样触发事件：
+
+```js
+window.sendChainlitMessage({
+  type: "system_message",
+  output: "你好，世界！",
+});
+```
+
+## 安全
+
+### 跨域资源共享 (CORS)
+
+别忘了将宿主网站的源添加到 [allow_origins](/backend/config/project) 配置字段的允许源列表中。
+
+### 身份认证
+
+如果你想在 Copilot 上认证用户，可以在 Chainlit 服务器上启用[身份认证](/authentication)。
+
+<Warning>
+  如果 Chainlit 应用和宿主网站部署在不同域名上，
+  你需要将 `CHAINLIT_COOKIE_SAMESITE=none` 添加到 Chainlit 应用的
+  环境变量中。
+</Warning>
+
+独立的 Chainlit 应用会处理认证流程，而 Copilot 需要配置 access token。此令牌用于向 Chainlit 服务器认证用户。
+
+宿主应用/网站负责生成令牌并将其作为 `accessToken` 传递。以下是在不同语言中生成令牌的示例：
+
+<Note>
+  你需要在[配置
+  身份认证](/authentication)时生成的 `CHAINLIT_AUTH_SECRET`。
+</Note>
+
+<CodeGroup>
+
+```py jwt.py
+import jwt
+from datetime import datetime, timedelta
+
+CHAINLIT_AUTH_SECRET = "your-secret"
+
+def create_jwt(identifier: str, metadata: dict) -> str:
+    to_encode = {
+      "identifier": identifier,
+      "metadata": metadata,
+      "exp": datetime.utcnow() + timedelta(minutes=60 * 24 * 15),  # 15 天
+      }
+
+    encoded_jwt = jwt.encode(to_encode, CHAINLIT_AUTH_SECRET, algorithm="HS256")
+    return encoded_jwt
+
+access_token = create_jwt("user-1", {"name": "John Doe"})
+```
+
+```ts jwt.ts
+import jwt from "jsonwebtoken";
+
+const CHAINLIT_AUTH_SECRET = "your-secret";
+
+interface Metadata {
+  [key: string]: any;
+}
+
+function createJwt(identifier: string, metadata: Metadata): string {
+  const toEncode = {
+    identifier: identifier,
+    metadata: metadata,
+    exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 15, // 15 天
+  };
+  const encodedJwt = jwt.sign(toEncode, CHAINLIT_AUTH_SECRET, {
+    algorithm: "HS256",
+  });
+  return encodedJwt;
+}
+
+const accessToken = createJwt("user-1", { name: "John Doe" });
+```
+
+</CodeGroup>

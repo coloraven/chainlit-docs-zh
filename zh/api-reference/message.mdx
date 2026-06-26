@@ -1,0 +1,126 @@
+---
+title: "Message"
+---
+
+`Message` 类用于发送、流式传输、更新或移除消息。
+
+## 参数
+
+<ParamField path="content" type="str">
+  消息的内容。
+</ParamField>
+<ParamField path="author" type="str" optional>
+  消息的作者，默认为配置文件中定义的聊天机器人名称。
+</ParamField>
+<ParamField path="elements" type="Element[]" optional>
+  要附加到消息的元素。
+</ParamField>
+<ParamField path="actions" type="Action[]" optional>
+  要附加到消息的操作。
+</ParamField>
+<ParamField path="language" type="str" optional>
+  若内容为代码，则指定代码语言。参见
+  https://react-code-blocks-rajinwonderland.vercel.app/?path=/story/codeblock--supported-languages
+  获取支持的语言列表。
+</ParamField>
+<ParamField path="metadata" type="Dict" optional>
+  要附加到消息的自定义元数据字典。会随消息持久化到数据层。
+</ParamField>
+<ParamField path="tags" type="List[str]" optional>
+  要附加到消息的标签，用于筛选和分类。
+</ParamField>
+<ParamField path="command" type="str" optional>
+  用户为此消息选择的[命令](/concepts/command)。用户选择命令后由 UI 自动设置。可在 [on_message](/api-reference/lifecycle-hooks/on-message) 处理器中通过 `msg.command` 访问。
+
+  <Note>
+    Since version **2.1.0**.
+  </Note>
+</ParamField>
+<ParamField path="modes" type="Dict[str, str]" optional>
+  用户为此消息选择的[模式](/concepts/modes)，格式为 `{mode_id: option_id}` 字典。用户配置模式选择器后由 UI 自动设置。可在 [on_message](/api-reference/lifecycle-hooks/on-message) 处理器中通过 `msg.modes` 访问。
+
+  <Note>
+    Since version **2.9.4**.
+  </Note>
+</ParamField>
+<ParamField path="id" type="str" optional>
+  消息的唯一标识符。若未提供，则自动生成 UUID。
+</ParamField>
+<ParamField path="parent_id" type="str" optional>
+  父步骤或消息的 ID。若未提供，则自动从当前步骤上下文解析。
+</ParamField>
+<ParamField path="type" type="str" default="assistant_message" optional>
+  消息类型（`assistant_message` 或 `user_message`）。根据消息方向自动设置。
+</ParamField>
+<ParamField path="created_at" type="str" optional>
+  消息创建的 ISO 8601 时间戳。调用 `.send()` 时自动设置为当前 UTC 时间。
+</ParamField>
+
+## 发送消息
+
+向 UI 发送新消息。
+
+```python
+import chainlit as cl
+
+
+@cl.on_message
+async def main(message: cl.Message):
+    await cl.Message(
+        content=f"收到：{message.content}",
+    ).send()
+```
+
+## 流式传输消息
+
+逐 token 向 UI 发送消息。
+
+```python
+import chainlit as cl
+
+token_list = ["the", "quick", "brown", "fox"]
+
+
+@cl.on_chat_start
+async def main():
+    msg = await cl.Message(content="").send()
+    for token in token_list:
+        await msg.stream_token(token)
+
+    await msg.update()
+```
+
+## 更新消息
+
+更新已发送的消息。
+
+```python
+import chainlit as cl
+
+
+@cl.on_chat_start
+async def main():
+    msg = cl.Message(content="Hello!")
+    await msg.send()
+
+    await cl.sleep(2)
+
+    msg.content = "Hello again!"
+    await msg.update()
+```
+
+## 移除消息
+
+从 UI 移除消息。
+
+```python
+import chainlit as cl
+
+
+@cl.on_chat_start
+async def main():
+    msg = cl.Message(content="Message 1")
+    await msg.send()
+    await cl.sleep(2)
+    await msg.remove()
+```

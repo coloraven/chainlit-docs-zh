@@ -1,0 +1,217 @@
+---
+title: UI
+---
+
+## 选项
+
+<ParamField path="name" type="str" default="'Assistant'">
+  应用和聊天机器人的名称。
+</ParamField>
+
+<ParamField path="description" type="str" optional>
+  应用的 `<meta name="description">` 内容。
+</ParamField>
+
+<ParamField
+  path="cot"
+  type="Literal['hidden', 'tool_call', 'full']"
+  default="full"
+>
+  思维链（COT）功能向用户展示聊天机器人为得出结论所采取的步骤。你可以隐藏 COT、仅显示工具调用，或完整显示。
+</ParamField>
+
+<ParamField path="default_theme" type="Literal['light', 'dark']" default="'dark'">
+  默认使用的主题名称
+</ParamField>
+
+<ParamField path="layout" type="Literal['default', 'wide']" default="'open'">
+  默认使用的布局名称
+</ParamField>
+
+<ParamField path="github" type="str" optional>
+  传入此选项将显示 GitHub 形状的链接。若未传入，将显示 Chainlit 仓库链接。
+</ParamField>
+
+<ParamField path="custom_css" type="str" optional>
+  用于定制 UI 的自定义 CSS 文件
+</ParamField>
+
+<ParamField path="custom_css_attributes" type="str" optional>
+  自定义 CSS 文件标签属性，例如 `<stylesheet src="public/custom.css" ... ></stylesheet>`
+</ParamField>
+
+<ParamField path="custom_js" type="str" optional>
+  用于定制 UI 的自定义 JavaScript 文件
+</ParamField>
+
+<ParamField path="custom_js_attributes" type="str" default="defer">
+  自定义 JavaScript 文件标签属性，例如 `<script src="public/custom.js" ... ></script>`
+</ParamField>
+
+<ParamField path="alert_style" type="Literal['classic', 'modern']" default="'classic'">
+  在两种可用警告样式之间切换：
+  - `'classic'`：传统左边框样式
+  - `'modern'`：圆角、柔和边框和透明背景
+</ParamField>
+
+<ParamField path="login_page_image" type="str" optional>
+  在登录页作为背景显示的自定义图像
+</ParamField>
+
+<ParamField path="login_page_image_filter" type="str" optional>
+  应用于登录页自定义背景图像的滤镜
+</ParamField>
+
+<ParamField path="login_page_image_dark_filter" type="str" optional>
+  选择深色主题时应用于登录页自定义背景图像的滤镜
+</ParamField>
+
+<ParamField path="custom_meta_url" type="str" optional>
+  `<meta property="og:url">` 标签的内容。用于链接预览（例如 iMessage、Twitter）。若未设置，默认为 Chainlit GitHub 仓库 URL。
+</ParamField>
+
+<ParamField path="custom_meta_image_url" type="str" optional>
+  用于站点预览的 `<meta property="og:image">` 标签内容
+</ParamField>
+
+<ParamField path="logo_file_url" type="str" optional>
+  用作欢迎屏幕和登录/登出时应用 logo 的图像 URL
+</ParamField>
+
+<ParamField path="default_avatar_file_url" type="str" optional>
+  用作助手发送消息头像的图像 URL
+</ParamField>
+
+<ParamField path="custom_build" type="str" optional>
+  包含自定义前端生产构建文件的目录（如适用）
+</ParamField>
+
+<ParamField path="language" type="str" optional>
+  为所有用户强制指定 UI 语言，覆盖浏览器语言偏好。
+  接受 `.chainlit/translations/` 中存在的任何区域代码（例如 `en-US`、`fr-FR`、`he-IL`）。
+  未设置（默认）时，语言从用户浏览器检测。
+
+  <Note>
+    自版本 **2.9.3** 起。
+  </Note>
+</ParamField>
+
+<ParamField path="header_links" type="List[HeaderLink]" optional>
+  在页头中 GitHub 链接旁边（或未提供时替代 GitHub 链接）显示的额外链接。
+  每个链接支持可选的 `target` 字段以控制链接打开方式：`_blank`（默认）、`_self`、`_parent` 或 `_top`。
+
+  <Note>
+    `target` 字段自版本 **2.8.3** 起可用。
+  </Note>
+</ParamField>
+
+<ParamField path="confirm_new_chat" type="bool" default={true}>
+  用户点击「New Chat」时是否显示确认对话框。
+  设置为 `false` 可跳过对话框并立即清空聊天。
+
+  <Note>
+    自版本 **2.9.6** 起。
+  </Note>
+</ParamField>
+
+<ParamField path="chat_settings_location" type="Literal['message_composer', 'sidebar']" default="'message_composer'">
+  聊天设置的显示位置。`"message_composer"` 在编辑器触发的模态框中显示。
+  `"sidebar"` 将其移至可调整大小的右侧边栏，页头有齿轮图标切换。
+
+  <Note>
+    自版本 **2.9.6** 起。
+  </Note>
+</ParamField>
+
+<ParamField path="default_chat_settings_open" type="bool" default={false}>
+  页面加载时聊天设置侧边栏是否打开。仅当
+  `chat_settings_location` 设置为 `"sidebar"` 时适用。
+
+  <Note>
+    自版本 **2.9.6** 起。
+  </Note>
+</ParamField>
+
+
+## 默认配置
+
+```toml
+[UI]
+# 助手名称。
+name = "Assistant"
+
+# default_theme = "dark"
+
+# layout = "wide"
+
+# default_sidebar_state = "open"
+
+# 创建新聊天时显示确认对话框
+# confirm_new_chat = true
+
+# 聊天设置显示位置："message_composer"（默认模态框）或 "sidebar"
+# chat_settings_location = "message_composer"
+
+# 页面加载时聊天设置侧边栏是否打开（仅 sidebar 模式）
+# default_chat_settings_open = false
+
+# 助手描述。用于 HTML 标签。
+# description = ""
+
+# 思维链（CoT）显示模式。可为 "hidden"、"tool_call" 或 "full"。
+cot = "full"
+
+# 为所有用户强制指定 UI 语言（覆盖浏览器检测）。
+# 接受 .chainlit/translations/ 下可用的任何区域设置
+# language = "en-US"
+
+# 指定用于定制用户界面的 CSS 文件。
+# CSS 文件可从 public 目录提供或通过外部链接。
+# custom_css = "/public/test.css"
+
+# 为自定义 CSS 文件指定额外属性
+# custom_css_attributes = "media=\\\"print\\\""
+
+# 指定用于定制用户界面的 JavaScript 文件。
+# JavaScript 文件可从 public 目录提供。
+# custom_js = "/public/test.js"
+
+# 警告框样式。可为 "classic" 或 "modern"。
+alert_style = "classic"
+
+# 为自定义 JS 文件指定额外属性
+# custom_js_attributes = "async type = \\\"module\\\""
+
+# 自定义登录页图像，相对于 public 目录或外部 URL
+# login_page_image = "/public/custom-background.jpg"
+
+# 自定义登录页图像滤镜（Tailwind 内置滤镜，无深色/浅色变体）
+# login_page_image_filter = "brightness-50 grayscale"
+# login_page_image_dark_filter = "contrast-200 blur-sm"
+
+
+# 为链接预览指定自定义 meta url（og:url）。
+# custom_meta_url = "https://example.com"
+
+# 指定自定义 meta 图像 url。
+# custom_meta_image_url = "https://chainlit-cloud.s3.eu-west-3.amazonaws.com/logo/chainlit_banner.png"
+
+# 直接从 URL 加载助手 logo。
+logo_file_url = ""
+
+# 直接从 URL 加载助手头像图像。
+default_avatar_file_url = ""
+
+# 为前端指定自定义构建目录。
+# 可用于定制前端代码。
+# 注意：若为相对路径，不应以斜杠开头。
+# custom_build = "./public/build"
+
+# 在页头指定一个或多个可选自定义链接。
+# [[UI.header_links]]
+#     name = "Issues"
+#     display_name = "Report Issue"
+#     icon_url = "https://avatars.githubusercontent.com/u/128686189?s=200&v=4"
+#     url = "https://github.com/Chainlit/chainlit/issues"
+#     target = "_self"  # 可选：_blank（默认）、_self、_parent、_top
+```

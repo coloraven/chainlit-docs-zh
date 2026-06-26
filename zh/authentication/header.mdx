@@ -1,0 +1,28 @@
+---
+title: Header
+---
+
+Header 身份认证是一种使用请求头对用户进行身份认证的简单方式。通常用于将身份认证委托给反向代理。
+
+`header_auth_callback` 函数会接收请求的 headers。若用户已通过身份认证，应返回 `User` 对象；否则返回 `None`。
+回调函数（由用户定义）负责管理身份认证逻辑。
+
+## 示例
+
+```python
+from typing import Optional
+
+import chainlit as cl
+
+
+@cl.header_auth_callback
+def header_auth_callback(headers: Dict) -> Optional[cl.User]:
+  # 验证请求头中 token 的签名（例如 jwt token）
+  # 或检查该值是否与数据库中的某条记录匹配
+  if headers.get("test-header") == "test-value":
+    return cl.User(identifier="admin", metadata={"role": "admin", "provider": "header"})
+  else:
+    return None
+```
+
+使用此代码时，除非向应用发送任何请求时请求头 `test-header` 的值为 `test-value`，否则无法访问应用。

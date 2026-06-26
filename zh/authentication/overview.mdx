@@ -1,0 +1,53 @@
+---
+title: 概览
+---
+
+Chainlit 应用默认是公开的。
+要启用身份认证并使应用变为私有，你需要：
+
+1. 定义 `CHAINLIT_AUTH_SECRET` 环境变量。这是用于签署身份认证令牌的密钥字符串。你可以随时更改它，但会登出所有用户。可使用 `chainlit create-secret` 轻松生成。
+2. 向应用添加一个或多个身份认证回调：
+
+<CardGroup cols={2}>
+  <Card
+    title="密码身份认证"
+    icon="shield"
+    color="#ea5a0c"
+    href="/authentication/password"
+  >
+    使用登录名/密码对用户进行身份认证。
+  </Card>
+  <Card
+    title="OAuth"
+    icon="google"
+    color="#0285c7"
+    href="/authentication/oauth"
+  >
+    使用你自己的 OAuth 应用（如 Google）对用户进行身份认证。
+  </Card>
+  <Card
+    title="Header"
+    icon="code"
+    color="#16a34a"
+    href="/authentication/header"
+  >
+    基于自定义请求头对用户进行身份认证。
+  </Card>
+</CardGroup>
+
+每个回调接受不同的输入，并可选择返回 `cl.User` 对象。若回调返回 `None`，则视为身份认证失败。
+
+<Warning>
+  确保每个用户都有唯一标识符，以防止他们共享数据。
+</Warning>
+
+## 获取当前已认证用户
+
+你可以通过[用户会话](/concepts/user-session)访问当前已认证用户。
+
+```py
+@cl.on_chat_start
+async def on_chat_start():
+    app_user = cl.user_session.get("user")
+    await cl.Message(f"你好 {app_user.identifier}").send()
+```

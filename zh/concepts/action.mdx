@@ -1,0 +1,47 @@
+---
+title: "操作"
+---
+
+操作（Action）是向用户界面发送可点击按钮的方式。每个操作都附加到一条[消息](/api-reference/message)，用户点击时可触发 Python 函数。
+
+## 创建操作
+
+操作通过消息发送到 UI：
+
+```python
+import chainlit as cl
+
+@cl.on_chat_start
+async def start():
+    # 在聊天机器人消息中发送操作按钮
+    actions = [
+        cl.Action(
+            name="action_button",
+            icon="mouse-pointer-click",
+            payload={"value": "example_value"},
+            label="点我！"
+        )
+    ]
+
+    await cl.Message(content="与下面的操作按钮交互：", actions=actions).send()
+```
+
+## 定义 Python 回调
+
+要处理用户点击操作按钮，需要使用 `@cl.action_callback` 装饰器定义回调函数：
+
+```python
+@cl.action_callback("action_button")
+async def on_action(action: cl.Action):
+    print(action.payload)
+```
+
+<Card
+  title="Action API"
+  color="#FFCF30"
+  icon="bolt"
+  href="/api-reference/action"
+>
+  了解更多 Action 相关信息。
+</Card>
+

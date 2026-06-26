@@ -1,0 +1,101 @@
+---
+title: "模式"
+---
+
+模式（Modes）系统允许你定义多个选择器分类（例如 Model、Reasoning Effort、Persona），用户可以为聊天会话进行配置。这比单一 LLM 选择器更灵活，且选择会在多条消息间保持。
+
+## 数据结构
+
+### ModeOption
+
+Mode 中的单个可选项。
+
+<ParamField path="id" type="str">
+  此选项的唯一标识符（例如 "gpt-4"、"planning"）。
+</ParamField>
+
+<ParamField path="name" type="str">
+  在 UI 中显示的选项名称（例如 "GPT-4"、"Planning"）。
+</ParamField>
+
+<ParamField path="description" type="str" optional>
+  在下拉菜单中显示的简要描述。
+</ParamField>
+
+<ParamField path="icon" type="str" optional>
+  选项的 lucide 图标名称或 URL。参见 https://lucide.dev/icons/。
+</ParamField>
+
+<ParamField path="default" type="boolean" optional>
+  此选项是否应默认选中。
+</ParamField>
+
+### Mode
+
+选项分类（例如 "Model"、"Reasoning"）。
+
+<ParamField path="id" type="str">
+  模式的唯一标识符（例如 "model"）。
+</ParamField>
+
+<ParamField path="name" type="str">
+  选择器触发器显示的名称。
+</ParamField>
+
+<ParamField path="options" type="List[ModeOption]">
+  此模式下可用选项的列表。
+</ParamField>
+
+## 设置可用模式
+
+你可以在 `on_chat_start` 处理器中使用 `cl.context.emitter.set_modes` 定义可用模式。
+
+```python
+import chainlit as cl
+
+@cl.on_chat_start
+async def start():
+    # 定义模型选择器
+    model_mode = cl.Mode(
+        id="model",
+        name="模型",
+        options=[
+            cl.ModeOption(id="gpt-4", name="GPT-4", icon="sparkles", default=True),
+            cl.ModeOption(id="gpt-3.5", name="GPT-3.5", icon="bolt"),
+        ]
+    )
+
+    # 定义推理强度选择器
+    reasoning_mode = cl.Mode(
+        id="reasoning",
+        name="推理",
+        options=[
+            cl.ModeOption(id="high", name="高强度", description="更深入思考"),
+            cl.ModeOption(id="low", name="低强度", description="更快响应"),
+        ]
+    )
+    
+    # 将模式发送到 UI
+    await cl.context.emitter.set_modes([model_mode, reasoning_mode])
+
+@cl.on_message
+async def message(msg: cl.Message):
+    # 直接从消息对象访问所选模式
+    # 返回 {mode_id: option_id} 字典
+    print(msg.modes) 
+    # 输出：{'model': 'gpt-4', 'reasoning': 'low'}
+    
+    selected_model = msg.modes.get("model")
+    
+    await cl.Message(
+        content=f"正在使用模型：{selected_model}"
+    ).send()
+```
+
+<Frame caption="用户选择模式">
+  <img src="/images/mode.png" />
+</Frame>
+
+<Warning>
+  自版本 **2.9.4** 起。如果你使用基于 SQL 的数据层，`steps` 表需要 `modes` 列。参见[迁移指南](/guides/migration/2.9.4)。
+</Warning>

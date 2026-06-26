@@ -1,0 +1,81 @@
+---
+title: "TaskList"
+---
+
+`TaskList` 类允许你在聊天机器人 UI 旁边显示任务列表。
+
+## 属性
+
+<ParamField path="status" type="str">
+  TaskList 的状态。建议使用简短文字，例如 "Ready"、"Running..."、"Failed"、"Done"。
+</ParamField>
+
+<ParamField path="tasks" type="Task">
+  要在 UI 中显示的任务列表。
+</ParamField>
+
+## Task 属性
+
+<ParamField path="title" type="str">
+  在 UI 中显示的任务标签。支持 Markdown 格式（例如 `**粗体**`、`[链接](url)`）。
+</ParamField>
+
+<ParamField path="status" type="TaskStatus">
+  取值为 `TaskStatus.READY`、`TaskStatus.RUNNING`、`TaskStatus.DONE` 或 `TaskStatus.FAILED` 之一。
+</ParamField>
+
+<ParamField path="forId" type="str">
+  可选的消息 ID，用于将任务关联到聊天消息，从而在历史记录中启用任务导航。
+</ParamField>
+
+<Note>
+  自 **2.9.0** 版本起，`Task.title` 支持 Markdown。
+</Note>
+
+## 用法
+
+TaskList 元素与其他元素略有不同：它不附加到 Message 或 Step，而是可以直接发送到聊天界面。
+
+```python
+import chainlit as cl
+
+
+@cl.on_chat_start
+async def main():
+    # 创建 TaskList
+    task_list = cl.TaskList()
+    task_list.status = "Running..."
+
+    # 创建任务并设为运行中状态
+    task1 = cl.Task(title="正在处理数据", status=cl.TaskStatus.RUNNING)
+    await task_list.add_task(task1)
+    # 创建另一个处于就绪状态的任务
+    task2 = cl.Task(title="正在执行计算")
+    await task_list.add_task(task2)
+
+    # 可选：将每条消息关联到对应任务，以便在聊天历史中导航
+    message = await cl.Message(content="已开始处理数据").send()
+    task1.forId = message.id
+
+    # 在界面中更新任务列表
+    await task_list.send()
+
+    # 在你的端执行某些操作
+    await cl.sleep(1)
+
+    # 更新任务状态
+    task1.status = cl.TaskStatus.DONE
+    task2.status = cl.TaskStatus.FAILED
+    task_list.status = "Failed"
+    await task_list.send()
+
+```
+
+<Frame caption="TaskList 运行示例">
+  <video
+    controls
+    autoPlay
+    loop
+    src="https://user-images.githubusercontent.com/13104895/251525854-57d1d9af-62a0-4f67-a530-1f0a3fc93488.mp4"
+  />
+</Frame>

@@ -1,0 +1,119 @@
+---
+title: "Step Decorator"
+---
+
+步骤装饰器会根据被装饰的函数记录步骤。默认情况下，函数的参数用作步骤的输入，返回值用作输出。
+
+在底层，步骤装饰器使用的是 [cl.Step](/api-reference/step-class) 类。
+
+## 参数
+
+<ParamField path="name" type="str" optional>
+  步骤的名称。默认为被装饰函数的名称。
+</ParamField>
+<ParamField path="type" type="str" default="undefined" optional>
+  步骤的类型，便于监控和调试。
+</ParamField>
+<ParamField path="language" type="str" optional>
+  输出的语言。参见
+  https://react-code-blocks-rajinwonderland.vercel.app/?path=/story/codeblock--supported-languages
+  获取支持的语言列表。
+</ParamField>
+<ParamField path="show_input" type="Union[bool, str]" default={false} optional>
+  默认仅显示步骤的输出。设为 `True` 可同时显示输入。也可设为 `json` 或 `python` 等语言以对输入进行语法高亮。
+</ParamField>
+<ParamField path="default_open" type="bool" default={false} optional>
+  步骤是否默认在 UI 中展开显示。
+
+  <Note>
+    Since version **2.3.0**. 基于 SQL 的数据层需要在 `steps` 表中包含 `defaultOpen` 列。参见[迁移指南](/guides/migration/2.3.0)。
+  </Note>
+</ParamField>
+<ParamField path="metadata" type="Dict" optional>
+  要附加到步骤的自定义元数据字典。会随步骤持久化到数据层。
+</ParamField>
+<ParamField path="tags" type="List[str]" optional>
+  要附加到步骤的标签，用于筛选和分类。
+</ParamField>
+<ParamField path="id" type="str" optional>
+  步骤的唯一标识符。若未提供，则自动生成 UUID。
+</ParamField>
+<ParamField path="icon" type="str" optional>
+  用于替代默认步骤头像的 Lucide 图标名称。参见 https://lucide.dev/icons 获取可用图标。
+
+  <Note>
+    Since version **2.11.0**.
+  </Note>
+</ParamField>
+<ParamField path="parent_id" type="str" optional>
+  父步骤的 ID。若未提供，则自动从装饰器嵌套层级解析。
+</ParamField>
+
+## 访问当前步骤
+
+你可以使用 `cl.context.current_step` 访问当前步骤对象并覆盖其值。
+
+```python
+import chainlit as cl
+
+@cl.step
+async def my_step():
+    current_step = cl.context.current_step
+
+    # 覆盖步骤的输入
+    current_step.input = "My custom input"
+
+    # 覆盖步骤的输出
+    current_step.output = "My custom output"
+```
+
+## 流式传输输出
+
+```python
+from openai import AsyncOpenAI
+
+import chainlit as cl
+
+client = AsyncOpenAI(api_key="YOUR_API_KEY")
+
+@cl.step(type="llm")
+async def gpt4():
+    settings = {
+        "model": "gpt-4",
+        "temperature": 0,
+    }
+
+    stream = await client.chat.completions.create(
+        messages=message_history, stream=True, **settings
+    )
+
+    current_step = cl.context.current_step
+
+    async for part in stream:
+        delta = part.choices[0].delta
+
+        if delta.content:
+            # 流式传输步骤的输出
+            await current_step.stream_token(delta.content)
+```
+
+## 嵌套步骤
+
+若在被装饰函数内部调用另一个带步骤装饰器的函数，子步骤将嵌套在父步骤之下。
+
+```python
+import chainlit as cl
+
+@cl.step
+async def parent_step():
+    await child_step()
+    return "Parent step output"
+
+@cl.step
+async def child_step():
+    return "Child step output"
+
+@cl.on_chat_start
+async def main():
+    await parent_step()
+```

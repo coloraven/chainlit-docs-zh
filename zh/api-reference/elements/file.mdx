@@ -1,0 +1,46 @@
+---
+title: "File"
+---
+
+`File` 类允许你显示一个按钮，供用户下载文件内容。
+
+你必须提供 `url`、`path` 或 `content` 字节内容中的至少一项。
+
+## 属性
+
+<ParamField path="name" type="str">
+  文件名。此名称会展示给用户。
+</ParamField>
+
+<ParamField path="url" type="str" optional>
+  文件的远程 URL。
+</ParamField>
+
+<ParamField path="path" type="str" optional>
+  文件的本地路径。
+</ParamField>
+
+<ParamField path="content" type="bytes" optional>
+  文件内容（字节格式）。
+</ParamField>
+
+## 示例
+
+```python
+import chainlit as cl
+
+
+@cl.on_chat_start
+async def start():
+    elements = [
+        cl.File(
+            name="hello.py",
+            path="./hello.py",
+            display="inline",
+        ),
+    ]
+
+    await cl.Message(
+        content="此消息包含一个文件元素", elements=elements
+    ).send()
+```

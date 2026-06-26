@@ -1,0 +1,64 @@
+---
+title: Embedchain
+---
+
+在本教程中，我们将逐步创建一个与 [Embedchain](https://github.com/embedchain/embedchain) 集成的 Chainlit 应用。
+
+<img src="/images/embedchain-example.gif" alt="Preview of what you'll be building" />
+
+## 步骤 1：创建 Chainlit 应用
+
+在 `app.py` 中，导入必要的包，并定义一个处理新[聊天会话](/concepts/chat-lifecycle)的函数，以及另一个处理来自 UI 的[消息](/concepts/message)的函数。
+
+### 使用 Embedchain
+
+```python app.py
+import chainlit as cl
+from embedchain import Pipeline as App
+
+import os
+
+os.environ["OPENAI_API_KEY"] = "sk-xxx"
+
+@cl.on_chat_start
+async def on_chat_start():
+    app = App.from_config(config={
+        'app': {
+            'config': {
+                'name': 'chainlit-app'
+            }
+        },
+        'llm': {
+            'config': {
+                'stream': True,
+            }
+        }
+    })
+    # 在此导入你的数据
+    app.add("https://www.forbes.com/profile/elon-musk/")
+    app.collect_metrics = False
+    cl.user_session.set("app", app)
+
+
+@cl.on_message
+async def on_message(message: cl.Message):
+    app = cl.user_session.get("app")
+    msg = cl.Message(content="")
+    for chunk in await cl.make_async(app.chat)(message.content):
+        await msg.stream_token(chunk)
+    
+    await msg.send()
+```
+## 步骤 2：运行应用
+
+要启动应用，请打开终端并导航到包含 `app.py` 的目录。然后运行以下命令：
+
+```bash
+chainlit run app.py -w
+```
+
+## 下一步
+
+恭喜！你刚刚使用 Chainlit 和 Embedchain 创建了第一个 LLM 应用。
+
+Happy coding! 🎉

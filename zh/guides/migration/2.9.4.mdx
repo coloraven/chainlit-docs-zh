@@ -1,0 +1,42 @@
+---
+title: 迁移到 Chainlit v2.9.4
+---
+
+## 更新 Chainlit
+
+通过将 Chainlit 更新到最新版本开始迁移：
+
+```bash
+pip install --upgrade chainlit
+```
+
+## 有哪些变化？
+
+Chainlit 2.9.4 引入了[模式](/concepts/modes)——一种多选系统，让用户为每条消息配置模型、推理力度或角色等类别。所选模式会持久化到 `steps` 表的新 `modes` 列中，与每条消息一起保存。
+
+完整变更日志见[此处](https://github.com/Chainlit/chainlit/blob/main/CHANGELOG.md)。
+
+## 如何迁移？
+
+### 1. 更新数据库 schema
+
+必须向 steps 表添加新的 `modes` 列，以便将所选模式与每条消息一起持久化。
+
+<Tabs>
+  <Tab title="官方数据层">
+    [官方数据层](https://github.com/Chainlit/chainlit-datalayer) 的 Prisma schema 尚未更新以包含此列。请手动对数据库运行以下迁移：
+
+    ```sql
+    ALTER TABLE "Step" ADD COLUMN IF NOT EXISTS "modes" JSONB;
+    ```
+  </Tab>
+  <Tab title="SQLAlchemy / 自定义 SQL">
+    ```sql
+    ALTER TABLE steps ADD COLUMN IF NOT EXISTS "modes" JSONB;
+    ```
+  </Tab>
+</Tabs>
+
+<Note>
+  DynamoDB 用户无需运行任何迁移——schema 是动态的。
+</Note>

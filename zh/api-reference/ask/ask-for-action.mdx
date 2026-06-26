@@ -1,0 +1,53 @@
+---
+title: "AskActionMessage"
+---
+
+在继续执行之前请求用户执行一个操作。
+如果用户未在指定时间内作答（见 `timeout`），将根据 `raise_on_timeout` 参数的设置抛出 `TimeoutError` 或返回 `None`。
+如果配置了项目 ID，消息将上传到云存储。
+
+### 属性
+
+<ParamField path="content" type="str">
+  消息内容。
+</ParamField>
+<ParamField path="actions" type="List[Action]">
+  提示用户选择的 [Action](/api-reference/action) 列表。
+</ParamField>
+<ParamField path="author" type="str" optional default="config.ui.name">
+  消息作者，默认为你在配置中定义的聊天机器人名称。
+</ParamField>
+<ParamField path="timeout" type="int" optional default={90}>
+  等待用户作答的秒数，超时后将抛出 TimeoutError。
+</ParamField>
+<ParamField path="raise_on_timeout" type="bool" optional default={false}>
+  若用户未在指定时间内作答，是否抛出 socketio TimeoutError。
+</ParamField>
+
+### 返回值
+
+<ResponseField name="response" type="AskActionResponse | None">
+  用户的响应。
+</ResponseField>
+
+### 示例
+
+```python
+import chainlit as cl
+
+
+@cl.on_chat_start
+async def main():
+    res = await cl.AskActionMessage(
+        content="请选择一个操作！",
+        actions=[
+            cl.Action(name="continue", payload={"value": "continue"}, label="✅ 继续"),
+            cl.Action(name="cancel", payload={"value": "cancel"}, label="❌ 取消"),
+        ],
+    ).send()
+
+    if res and res.get("payload").get("value") == "continue":
+        await cl.Message(
+            content="继续！",
+        ).send()
+```

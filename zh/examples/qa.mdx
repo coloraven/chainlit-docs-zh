@@ -1,0 +1,149 @@
+---
+title: 文档问答
+---
+
+在本示例中，我们将构建一个聊天机器人问答应用。我们将学习如何：
+
+- 上传文档
+- 从文件创建向量嵌入
+- 创建能够显示用于生成答案的来源的聊天机器人应用
+
+此示例灵感来自 [LangChain 文档](https://python.langchain.com/en/latest/use_cases/question_answering.html)
+
+## 前置条件
+
+此示例有额外依赖。可通过以下命令安装：
+
+```bash
+pip install langchain langchain-community chromadb tiktoken openai langchain-openai
+```
+
+然后，你需要前往[此处](https://platform.openai.com/account/api-keys)创建 OpenAI 密钥。
+
+<Note>
+  国情咨文文件可在
+  [此处](https://github.com/Chainlit/cookbook/blob/main/llama-index/data/state_of_the_union.txt) 获取
+</Note>
+
+## 使用 LangChain 的对话式文档问答
+
+```python qa.py
+import os
+
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.vectorstores import Chroma
+from langchain.chains import (
+    ConversationalRetrievalChain,
+)
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+
+from langchain_community.chat_message_histories import ChatMessageHistory
+from langchain.memory import ConversationBufferMemory
+
+import chainlit as cl
+
+os.environ["OPENAI_API_KEY"] = (
+    "OPENAI_API_KEY"
+)
+
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
+
+
+@cl.on_chat_start
+async def on_chat_start():
+    files = None
+
+    # 等待用户上传文件
+    while files is None:
+        files = await cl.AskFileMessage(
+            content="请上传文本文件以开始！",
+            accept=["text/plain"],
+            max_size_mb=20,
+            timeout=180,
+        ).send()
+
+    file = files[0]
+
+    msg = cl.Message(content=f"正在处理 `{file.name}`...")
+    await msg.send()
+
+    with open(file.path, "r", encoding="utf-8") as f:
+        text = f.read()
+
+    # 将文本分割为块
+    texts = text_splitter.split_text(text)
+
+    # 为每个块创建元数据
+    metadatas = [{"source": f"{i}-pl"} for i in range(len(texts))]
+
+    # 创建 Chroma 向量存储
+    embeddings = OpenAIEmbeddings()
+    docsearch = await cl.make_async(Chroma.from_texts)(
+        texts, embeddings, metadatas=metadatas
+    )
+
+    message_history = ChatMessageHistory()
+
+    memory = ConversationBufferMemory(
+        memory_key="chat_history",
+        output_key="answer",
+        chat_memory=message_history,
+        return_messages=True,
+    )
+
+    # 创建使用 Chroma 向量存储的 chain
+    chain = ConversationalRetrievalChain.from_llm(
+        ChatOpenAI(model_name="gpt-4o-mini", temperature=0, streaming=True),
+        chain_type="stuff",
+        retriever=docsearch.as_retriever(),
+        memory=memory,
+        return_source_documents=True,
+    )
+
+    # 通知用户系统已就绪
+    msg.content = f"处理 `{file.name}` 完成。你现在可以提问了！"
+    await msg.update()
+
+    cl.user_session.set("chain", chain)
+
+
+@cl.on_message
+async def main(message: cl.Message):
+    chain = cl.user_session.get("chain")  # type: ConversationalRetrievalChain
+    cb = cl.AsyncLangchainCallbackHandler()
+
+    res = await chain.acall(message.content, callbacks=[cb])
+    answer = res["answer"]
+    source_documents = res["source_documents"]  # type: List[Document]
+
+    text_elements = []  # type: List[cl.Text]
+
+    if source_documents:
+        for source_idx, source_doc in enumerate(source_documents):
+            source_name = f"source_{source_idx}"
+            # 创建消息中引用的文本元素
+            text_elements.append(
+                cl.Text(
+                    content=source_doc.page_content, name=source_name, display="side"
+                )
+            )
+        source_names = [text_el.name for text_el in text_elements]
+
+        if source_names:
+            answer += f"\n来源: {', '.join(source_names)}"
+        else:
+            answer += "\n未找到来源"
+
+    await cl.Message(content=answer, elements=text_elements).send()
+```
+
+## 试用
+
+```bash
+chainlit run qa.py
+```
+
+然后可以向 UI 上传任意 `.txt` 文件并提问。
+若使用 `state_of_the_union.txt`，可以提问 `What did the president say about Ketanji Brown Jackson?`。
+
+![QA](/images/qa.png)

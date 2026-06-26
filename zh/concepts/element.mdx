@@ -1,0 +1,156 @@
+---
+title: "元素"
+---
+
+文本消息是聊天机器人的基本单元，但我们常常需要向用户发送更多内容，例如图片、视频等。
+
+这就是元素（Element）的用武之地。每个元素是可以附加到[消息](/concepts/message)或[步骤](/concepts/step)并在用户界面上显示的内容片段。
+
+<CardGroup cols={2}>
+  <Card
+    title="Image Element"
+    icon="image"
+    color="#0285c7"
+    href="/api-reference/elements/image"
+  >
+    适合展示生成的图片。
+  </Card>
+  <Card
+    title="PDF Element"
+    icon="file-pdf"
+    color="#16a34a"
+    href="/api-reference/elements/pdf"
+  >
+    适合展示 RAG 来源。
+  </Card>
+  <Card
+    title="Custom Element"
+    icon="react"
+    color="#61DBFB"
+    href="/api-reference/elements/custom"
+  >
+    使用 JSX 编写自定义元素。
+  </Card>
+  <Card
+    title="More Elements"
+    icon="wind"
+    color="#dc2626"
+    href="/api-reference/elements"
+  >
+    可在用户界面上显示的元素完整列表。
+  </Card>
+</CardGroup>
+
+## 示例
+
+要将元素附加到消息或步骤，需要：
+
+1. 实例化元素
+2. 将元素附加到消息或步骤
+
+```python
+import chainlit as cl
+
+
+@cl.on_chat_start
+async def start():
+    image = cl.Image(path="./cat.jpeg", name="image1", display="inline")
+
+    # 将图片附加到消息
+    await cl.Message(
+        content="此消息包含一张图片！",
+        elements=[image],
+    ).send()
+```
+
+## 显示选项
+
+有三种显示选项决定元素的渲染方式：
+
+### Side
+
+```python
+@cl.on_chat_start
+async def start():
+    # 注意 display 选项
+    image = cl.Image(path="./cat.jpeg", name="cat image", display="side")
+
+    await cl.Message(
+        # 注意消息内容中引用了图片名称
+        content="这是猫咪图片！",
+        elements=[image],
+    ).send()
+```
+
+图片不会显示在消息中。取而代之的是，图片名称会显示为可点击链接。
+用户点击链接后，图片会显示在消息侧边。
+
+### Page
+
+```python
+@cl.on_chat_start
+async def start():
+    # 注意 display 选项
+    image = cl.Image(path="./cat.jpeg", name="cat image", display="page")
+
+    await cl.Message(
+        # 注意消息内容中引用了图片名称
+        content="这是猫咪图片！",
+        elements=[image],
+    ).send()
+```
+
+图片不会显示在消息中。取而代之的是，图片名称会显示为可点击链接。
+点击链接会跳转到专用页面，在该页面中显示图片。
+
+### Inline
+
+```python
+@cl.on_chat_start
+async def start():
+    # 注意 display 选项
+    image = cl.Image(path="./cat.jpeg", name="cat image", display="inline")
+
+    await cl.Message(
+        # 注意消息内容中未引用图片名称
+        content="你好！",
+        elements=[image],
+    ).send()
+```
+
+无论消息内容中是否引用图片名称，图片都会显示在消息下方。
+
+## 从 Python 控制元素侧边栏
+
+你可以直接在 Python 中打开/关闭侧边栏。附加到侧边栏的元素不会被持久化，因为该侧边栏状态并非来自 UI 交互。
+
+```python
+import chainlit as cl
+
+
+@cl.on_chat_start
+async def start():
+    # 定义要显示的元素
+    elements = [
+        cl.Image(path="./cat.jpeg", name="image1"),
+        cl.Pdf(path="./dummy.pdf", name="pdf1"),
+        cl.Text(content="这是一份侧边栏文本文档", name="text1"),
+        cl.Text(content="这是一份页面文本文档", name="text2"),
+    ]
+
+    # 设置元素将打开侧边栏
+    await cl.ElementSidebar.set_elements(elements)
+    await cl.ElementSidebar.set_title("测试标题")
+
+@cl.on_message
+async def message(msg: cl.Message):
+    # 你可以更新元素
+    await cl.ElementSidebar.set_elements([cl.Text(content="文本已更改！")])
+    # 你可以更新标题
+    await cl.ElementSidebar.set_title("标题已更改！")
+
+    await cl.sleep(2)
+
+    # 将元素设置为空数组将关闭侧边栏
+    await cl.ElementSidebar.set_elements([])
+```

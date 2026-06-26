@@ -1,0 +1,78 @@
+---
+title: LiteLLM
+---
+
+在本教程中，我们将引导你完成创建与 [LiteLLM Proxy](https://docs.litellm.ai/docs/simple_proxy) 集成的 Chainlit 应用的步骤。
+
+在 Chainlit 中使用 LiteLLM Proxy 的优势包括：
+
+- 你可以[以 OpenAI API 格式调用 100+ 个 LLM](https://docs.litellm.ai/docs/providers)
+- 使用 Virtual Keys 设置预算限制并跟踪用量
+- 在 UI 的[步骤](/concepts/step)中查看 LLM API 调用，并在提示词 Playground 中探索它们
+
+<Warning>
+  如果你已经在使用 Langchain 或 LlamaIndex 等其他集成，则不应配置此集成。两个集成都会记录同一次生成，并在 UI 中创建重复的[步骤](/concepts/step)。
+</Warning>
+
+## 前置条件
+
+开始之前，请确保你已具备：
+
+- 已正确安装 Chainlit
+- 已安装 OpenAI 包
+- [LiteLLM Proxy 正在运行](https://docs.litellm.ai/docs/proxy/deploy)
+- [LiteLLM Proxy API 密钥](https://docs.litellm.ai/docs/proxy/virtual_keys)
+- 对 Python 编程有基本了解
+
+## 步骤 1：创建 Python 文件
+
+在项目目录中创建一个名为 `app.py` 的新 Python 文件。该文件将包含 LLM 应用的主要逻辑。
+
+## 步骤 2：编写应用逻辑
+
+在 `app.py` 中，导入必要的包，并定义一个处理来自 UI 的[消息](/concepts/message)的函数。
+
+```python
+from openai import AsyncOpenAI
+import chainlit as cl
+client = AsyncOpenAI(
+    api_key="anything",            # litellm proxy virtual key
+    base_url="http://0.0.0.0:4000" # litellm proxy base_url
+)
+
+# 为 OpenAI 客户端启用检测
+cl.instrument_openai()
+
+settings = {
+    "model": "gpt-3.5-turbo", # 要发送给 litellm proxy 的模型
+    "temperature": 0,
+    # ... 更多设置
+}
+
+@cl.on_message
+async def on_message(message: cl.Message):
+    response = await client.chat.completions.create(
+        messages=[
+            {
+                "content": "你是一个乐于助人的机器人，你总是用西班牙语回复",
+                "role": "system"
+            },
+            {
+                "content": message.content,
+                "role": "user"
+            }
+        ],
+        **settings
+    )
+    await cl.Message(content=response.choices[0].message.content).send()
+```
+
+## 步骤 3：运行应用
+
+要启动应用，请打开终端并导航到包含 `app.py` 的目录。然后运行以下命令：
+
+```bash
+chainlit run app.py -w
+```
+
+`-w` 标志会启用 Chainlit 的自动重载，因此你无需在每次修改应用后重启服务器。你的聊天机器人 UI 现在应可通过 http://localhost:8000 访问。

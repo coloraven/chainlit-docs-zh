@@ -1,0 +1,56 @@
+---
+title: "MultiSelect"
+---
+
+### 属性
+
+<ParamField path="id" type="str">
+  用于从设置中检索控件值的标识符。
+</ParamField>
+
+<ParamField path="label" type="str">
+  输入控件的标签。
+</ParamField>
+
+<ParamField path="values" type="List[str]" optional>
+  选择选项的标签。
+</ParamField>
+
+<ParamField path="items" type="Dict[str, str]" optional>
+  选择选项的标签及其对应值。
+</ParamField>
+
+<ParamField path="initial" type="List[str]" optional>
+  初始选中的值。
+</ParamField>
+
+<ParamField path="tooltip" type="str" optional>
+  悬停在标签旁工具提示图标上时显示的工具提示文本。
+</ParamField>
+
+<ParamField path="description" type="str" optional>
+  显示在输入控件下方的文本。
+</ParamField>
+
+### 用法
+
+```python Code Example
+import chainlit as cl
+from chainlit.input_widget import MultiSelect
+
+
+@cl.on_chat_start
+async def start():
+    settings = await cl.ChatSettings(
+        [
+            MultiSelect(
+                id="Tools",
+                label="已启用的工具",
+                values=["web_search", "calculator", "file_reader", "code_interpreter"],
+                initial=["web_search", "calculator"],
+            )
+        ]
+    ).send()
+    value = settings["Tools"]
+
+```

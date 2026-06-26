@@ -1,0 +1,168 @@
+---
+title: Teams
+---
+
+要让 Chainlit 应用在 Teams 上可用，你需要创建一个 Teams 机器人并设置必要的环境变量。
+
+## 工作原理
+
+Teams 机器人在私信中可用。
+
+<Frame caption="预览">
+  <img src="/images/teams/demo.gif" />
+</Frame>
+
+## 支持的功能
+
+| 消息 | 流式 | 元素 | 音频 | 询问用户 | 聊天历史 | 聊天配置 | 反馈 |
+| ------- | --------- | -------- | ----- | -------- | ------------ | ------------- | -------- |
+| ✅      | ❌        | ✅       | ❌    | ❌       | ❌           | ❌            | ✅       |
+
+## 安装 Botbuilder 库
+
+Botbuilder 库不包含在 Chainlit 依赖中。你需要手动安装。
+
+```bash
+pip install botbuilder-core
+```
+
+## 创建 Teams 应用
+
+首先，导航到 [App Management](https://dev.teams.microsoft.com/apps) 页面。在此创建新应用。
+
+<Frame caption="创建 Teams 应用">
+  <img src="/images/teams/create-app.png" />
+</Frame>
+
+## 填写应用基本信息
+
+导航到 Configure > Basic Information，填写应用的基本信息。
+在填写所有必填字段之前，你将无法发布应用。
+
+<Frame caption="基本信息">
+  <img src="/images/teams/basic-infos.png" />
+</Frame>
+
+## 创建机器人
+
+导航到 Configure > App features，添加 Bot 功能。
+创建新机器人，授予以下权限并保存。
+
+<Frame caption="机器人权限">
+  <img src="/images/teams/bot-permissions.png" />
+</Frame>
+
+## 前往 Bot Framework Portal
+
+导航到 [Bot Framework Portal](https://dev.botframework.com/bots/)，点击你刚创建的 Bot，然后进入 Settings 页面。
+
+## 获取 App ID
+
+在 Bot Framework Portal 中，你会找到 app ID。复制它并在 Chainlit 应用中设置为环境变量。
+
+```
+TEAMS_APP_ID=your_app_id
+```
+
+<Frame caption="获取 App ID">
+  <img src="/images/teams/app-id.png" />
+</Frame>
+
+## 本地开发
+
+如果你在本地工作，必须将本地 Chainlit 应用暴露到互联网，以接收 Teams 的传入消息。你可以使用 [ngrok](https://ngrok.com/)。
+
+```bash
+ngrok http 8000
+```
+
+这将给你一个公共 URL，可用于设置应用清单。部署 Chainlit 到公共主机后，别忘了替换它。
+
+## 设置消息端点
+
+在 Configuration 下，将消息端点设置为 Chainlit 应用的 HTTPS URL，并添加 `/teams/events` 后缀。
+
+<Frame caption="消息端点">
+  <img src="/images/teams/endpoint.png" />
+</Frame>
+
+## 获取 App Secret
+
+在同一页面上，你会看到一个蓝色的 "Manage Microsoft App ID and password" 按钮。点击它。
+
+<Frame caption="管理密码">
+  <img src="/images/teams/manage-password.png" />
+</Frame>
+
+导航到 Manage > Certificates & secrets，创建新的客户端密钥。复制它并在 Chainlit 应用中设置为环境变量。
+
+```
+TEAMS_APP_PASSWORD=your_app_secret
+```
+
+## 支持多租户账户类型
+
+导航到 Manage > Authentication，切换 "Accounts in any organizational directory (Any Microsoft Entra ID tenant - Multitenant)" 然后保存。
+
+<Frame caption="多租户">
+  <img src="/images/teams/multitenant.png" />
+</Frame>
+
+## 启动 Chainlit 应用
+
+由于 Chainlit 应用未运行，Teams 机器人将无法与其通信。
+
+示例中，我们将使用这个简单应用：
+
+```python my_app.py
+import chainlit as cl
+
+@cl.on_message
+async def on_message(msg: cl.Message):
+    # 访问 teams 用户
+    print(cl.user_session.get("user"))
+
+    # 访问可能附加的文件
+    attached_files = msg.elements
+
+    await cl.Message(content="你好，世界").send()
+```
+
+<Note>
+  提醒：确保环境变量已设置，且本地
+  chainlit 应用已通过 ngrok 暴露到互联网。
+</Note>
+
+启动 Chainlit 应用：
+
+```bash
+chainlit run my_app.py -h
+```
+
+<Note>
+  使用 -h 以避免打开默认 Chainlit UI，因为我们使用的是 Teams。
+</Note>
+
+## 发布机器人
+
+返回 [App Management](https://dev.teams.microsoft.com/apps) 页面，导航到 "Publish to org" 并点击 "Publish"。
+
+<Frame caption="发布">
+  <img src="/images/teams/publish.png" />
+</Frame>
+
+## 授权机器人
+
+机器人必须经 Teams 管理员授权后才能使用。为此，导航到 [Teams admin center](https://admin.teams.microsoft.com/policies/manage-apps) 并找到该应用。
+
+<Frame caption="发布">
+  <img src="/images/teams/app-blocked.png" />
+</Frame>
+
+然后授权它。
+
+<Frame caption="发布">
+  <img src="/images/teams/authorize-app.png" />
+</Frame>
+
+你现在应该可以通过 Teams 与 Chainlit 应用交互了。

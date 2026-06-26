@@ -1,0 +1,43 @@
+---
+title: "make_async"
+---
+
+`make_async` 函数接收一个同步函数（例如 LangChain 智能体），并返回一个异步函数，该函数会在独立线程中运行原函数。
+这对于运行长时间同步任务而不阻塞事件循环非常有用。
+
+## 参数
+
+<ParamField path="func" type="Callable">
+  要在独立线程中运行的同步函数。
+</ParamField>
+
+## 返回值
+
+<ResponseField name="async_function" type="Coroutine" required>
+  在独立线程中运行同步函数的异步函数。
+</ResponseField>
+
+## 用法
+
+```python
+import time
+import chainlit as cl
+
+def sync_func():
+    time.sleep(5)
+    return "Hello!"
+
+@cl.on_message
+async def main(message: cl.Message):
+    answer = await cl.make_async(sync_func)()
+    await cl.Message(
+        content=answer,
+    ).send()
+```
+
+```python LangChain agent
+import chainlit as cl
+
+res = await cl.make_async(agent)(input_str, callbacks=[cl.LangchainCallbackHandler()])
+await cl.Message(content=res["text"]).send()
+```

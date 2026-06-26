@@ -1,0 +1,27 @@
+---
+title: 迁移到 Chainlit v1.0.500
+---
+
+<Note>加入 Discord 获取实时更新：https://discord.gg/AzyvDHWARx</Note>
+
+## 更新 Chainlit
+
+通过将 Chainlit 更新到最新版本开始迁移：
+
+```bash
+pip install --upgrade chainlit
+```
+
+## 有哪些变化？
+
+完整变更日志见[此处](https://github.com/Chainlit/chainlit/blob/main/CHANGELOG.md#10500---2023-04-02)。
+
+## 如何迁移？
+
+### 1. 重新生成翻译
+
+由于翻译文件已更新，需要重新生成。删除 `.chainlit/translations` 文件夹并重启应用即可。
+
+### 2. 更新 multi_modal 配置项
+
+`multi_modal` 配置项已更新。你可以删除整个 `./chainlit/config.toml` 文件并重启应用，或手动更新 `multi_modal` 设置（示例见[此处](http://localhost:3002/backend/config/features#default-configuration)）。

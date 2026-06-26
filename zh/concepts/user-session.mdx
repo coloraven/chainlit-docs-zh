@@ -1,0 +1,80 @@
+---
+title: 用户会话
+---
+
+用户会话（User Session）用于在聊天[生命周期](/concepts/chat-lifecycle)期间在内存中持久化数据。每个用户会话对特定用户和特定聊天会话都是唯一的。
+
+## 为什么使用用户会话？
+
+假设你想跟踪每个聊天会话的消息数量。
+
+一个朴素的实现可能如下：
+
+<Warning>
+  此示例仅用于说明。不建议在生产环境中使用
+  此代码。
+</Warning>
+
+```python Naive Example
+import chainlit as cl
+
+counter = 0
+
+
+@cl.on_message
+async def on_message(message: cl.Message):
+    global counter
+    counter += 1
+
+    await cl.Message(content=f"你已发送 {counter} 条消息！").send()
+```
+
+乍看之下，这段代码似乎可以工作。但它有一个重大缺陷：如果两个用户同时与机器人聊天，两个用户都会递增同一个 `counter`。
+
+这就是用户会话的用武之地。让我们使用用户会话重写上述示例：
+
+```python Correct example
+import chainlit as cl
+
+
+@cl.on_chat_start
+def on_chat_start():
+    cl.user_session.set("counter", 0)
+
+
+@cl.on_message
+async def on_message(message: cl.Message):
+    counter = cl.user_session.get("counter")
+    counter += 1
+    cl.user_session.set("counter", counter)
+
+    await cl.Message(content=f"你已发送 {counter} 条消息！").send()
+```
+
+## 用户会话默认值
+
+默认情况下，Chainlit 会在用户会话中存储与聊天会话相关的数据。
+
+以下键保留用于与聊天会话相关的数据：
+
+<ParamField path="id" type="str">
+  会话 ID。
+</ParamField>
+<ParamField path="user" type="cl.User">
+  仅在启用了[身份认证](/authentication)时设置。包含
+  启动此聊天会话的用户对象。
+</ParamField>
+<ParamField path="chat_profile" type="str">
+  仅在使用[聊天
+  配置（Chat Profiles）](/advanced-features/chat-profiles)功能时相关。包含该用户
+  选择的聊天配置。
+</ParamField>
+<ParamField path="chat_settings" type="Dict">
+  仅在使用[聊天
+  设置（Chat Settings）](/advanced-features/chat-settings)功能时相关。包含该用户
+  提供的聊天设置。
+</ParamField>
+<ParamField path="env" type="Dict" default="{}">
+  仅在使用 [user_env](/backend/config/project) 配置时相关。
+  包含该用户提供的环境变量。
+</ParamField>

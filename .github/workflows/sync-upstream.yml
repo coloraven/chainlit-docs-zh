@@ -1,0 +1,66 @@
+name: Sync Upstream
+
+on:
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout fork
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Add upstream remote
+        run: |
+          git remote add upstream https://github.com/Chainlit/docs.git || true
+          git fetch upstream main
+
+      - name: Check if behind upstream
+        id: behind
+        run: |
+          BEHIND=$(git rev-list --count HEAD..upstream/main)
+          echo "count=$BEHIND" >> "$GITHUB_OUTPUT"
+          echo "Commits behind upstream/main: $BEHIND"
+
+      - name: No upstream changes
+        if: steps.behind.outputs.count == '0'
+        run: echo "Already up to date with upstream. Exiting."
+
+      - name: Merge upstream and regenerate site
+        if: steps.behind.outputs.count != '0'
+        run: |
+          BRANCH="sync/upstream-$(date +%Y%m%d-%H%M%S)"
+          echo "BRANCH=$BRANCH" >> "$GITHUB_ENV"
+          git checkout -b "$BRANCH"
+          git merge upstream/main --no-edit
+          python scripts/copy_upstream_nav.py
+          python scripts/translation_status.py --since-merge --report --output translation-report.md
+          python scripts/translation_status.py --all
+          python scripts/apply_zh_site.py
+          git add i18n/upstream-navigation.json .translation-lock.json docs.json translation-report.md
+          git diff --staged --quiet || git commit -m "chore: sync upstream Chainlit/docs"
+
+      - name: Create pull request
+        if: steps.behind.outputs.count != '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git push -u origin "$BRANCH"
+          gh pr create \
+            --title "chore: sync upstream Chainlit/docs" \
+            --body-file translation-report.md \
+            --label needs-translation

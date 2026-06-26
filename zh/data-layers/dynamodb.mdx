@@ -1,0 +1,142 @@
+---
+title: DynamoDB 数据层
+---
+
+此数据层还支持 `BaseStorageClient`，可将元素存储到 AWS S3 或 Azure Blob Storage。
+
+## 示例
+以下是设置此数据层的示例。首先安装 boto3：
+```bash
+pip install boto3
+```
+
+导入自定义数据层和存储客户端，并在 Chainlit 应用开头设置 `cl_data._data_layer` 变量。
+
+```python
+import chainlit.data as cl_data
+from chainlit.data.dynamodb import DynamoDBDataLayer
+from chainlit.data.storage_clients.s3 import S3StorageClient
+
+storage_client = S3StorageClient(bucket="<Your Bucket>")
+
+cl_data._data_layer = DynamoDBDataLayer(table_name="<Your Table>", storage_provider=storage_client)
+```
+
+## 表结构
+
+以下是用于创建 DynamoDB 表的 CloudFormation 模板：
+```json
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Resources": {
+    "DynamoDBTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "TableName": "<YOUR-TABLE-NAME>",
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "PK",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "SK",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "UserThreadPK",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "UserThreadSK",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "PK",
+            "KeyType": "HASH"
+          },
+          {
+            "AttributeName": "SK",
+            "KeyType": "RANGE"
+          }
+        ],
+        "GlobalSecondaryIndexes": [
+          {
+            "IndexName": "UserThread",
+            "KeySchema": [
+              {
+                "AttributeName": "UserThreadPK",
+                "KeyType": "HASH"
+              },
+              {
+                "AttributeName": "UserThreadSK",
+                "KeyType": "RANGE"
+              }
+            ],
+            "Projection": {
+              "ProjectionType": "INCLUDE",
+              "NonKeyAttributes": ["id", "name"]
+            }
+          }
+        ],
+        "BillingMode": "PAY_PER_REQUEST"
+      }
+    }
+  }
+}
+```
+
+## 日志
+
+DynamoDB 数据层定义了 chainlit logger 的子 logger。
+
+```python
+import logging
+from chainlit import logger
+
+logger.getChild("DynamoDB").setLevel(logging.DEBUG)
+```
+
+## 限制
+不支持按正面/负面反馈筛选。
+
+数据层方法不是 async 的。Boto3 不是 async 的，因此数据层使用非 async 阻塞 I/O。
+
+## 设计
+
+此实现使用单表设计（Single Table Design）。一张表中有 4 种不同的实体类型，通过 PK 和 SK 中的前缀标识。
+
+实体类型如下：
+```ts
+type User = {
+    PK: "USER#{user.identifier}"
+    SK: "USER"
+    // ...PersistedUser
+}
+
+type Thread = {
+    PK: f"THREAD#{thread_id}"
+    SK: "THREAD"
+    // GSI: UserThread 用于在 list_threads 中查询
+    UserThreadPK: f"USER#{user_id}"
+    UserThreadSK: f"TS#{ts}"
+    // ...ThreadDict
+}
+
+type Step = {
+    PK: f"THREAD#{threadId}"
+    SK: f"STEP#{stepId}"
+    // ...StepDict
+
+    // feedback 作为 step 的一部分存储。
+    // 注意：feedback.value 在 dynamo 中以 Decimal 存储，不可 JSON 序列化
+    feedback?: Feedback
+}
+
+type Element = {
+    "PK": f"THREAD#{threadId}"
+    "SK": f"ELEMENT#{element.id}"
+    // ...ElementDict
+}
+```

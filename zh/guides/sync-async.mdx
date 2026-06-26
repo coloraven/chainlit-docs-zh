@@ -1,0 +1,83 @@
+---
+title: 异步 / 同步
+---
+
+异步编程是一种强大的方式，可以在不阻塞程序执行的情况下并发处理多个任务。Chainlit 默认采用异步，使智能体能够并行执行任务，并允许单个应用服务多个用户。
+Python 引入了 `asyncio` 库，通过 `async/await` 语法更轻松地编写异步代码。本入门指南将帮助你理解 Python 异步编程的基础知识，以及如何在 Chainlit 项目中使用它。
+
+### 理解 async/await
+
+`async` 和 `await` 关键字用于在 Python 中定义和使用异步代码。`async` 函数是协程，这是一种特殊函数，可以暂停执行并在稍后恢复，同时允许其他任务运行。
+
+要定义 async 函数，使用 `async def` 语法：
+
+```python
+async def my_async_function():
+    # 异步代码写在这里
+```
+
+要调用 async 函数，需要使用 `await` 关键字：
+
+```python
+async def another_async_function():
+    result = await my_async_function()
+```
+
+### 在 Chainlit 中使用
+
+Chainlit 使用异步编程高效处理事件和任务。创建 Chainlit 智能体时，通常需要定义 async 函数来处理事件和执行操作。
+
+例如，创建响应 Chainlit 消息的 async 函数：
+
+```python
+import chainlit as cl
+
+@cl.on_message
+async def main(message: cl.Message):
+    # 自定义逻辑写在这里
+
+    # 向用户发送响应
+    await cl.Message(
+        content=f"已收到: {message.content}",
+    ).send()
+```
+
+### 长时间运行的同步任务
+
+有时需要在 Chainlit 项目中运行长时间运行的同步函数。为防止阻塞事件循环，可以使用 Chainlit 库提供的 `make_async` 函数将同步函数转换为异步函数：
+
+```python
+from chainlit import make_async
+
+def my_sync_function():
+    # 同步代码写在这里
+    import time
+    time.sleep(10)
+    return 0
+
+async_function = make_async(my_sync_function)
+
+async def main():
+    result = await async_function()
+```
+
+通过这种方式，可以在必要时仍使用同步函数，同时保持项目的非阻塞特性。
+
+### 从同步函数调用 async 函数
+
+若需要在 sync 函数中运行 async 函数，可以使用 Chainlit 库提供的 `run_sync` 函数：
+
+```python
+from chainlit import run_sync
+
+async def my_async_function():
+    # 异步代码写在这里
+
+def main():
+    result = run_sync(my_async_function())
+
+main()
+```
+
+遵循本指南，你现在应已掌握 Python 异步编程的基础知识以及如何在 Chainlit 项目中使用它。
+继续与 Chainlit 协作时，你会发现 async/await 和 asyncio 库提供了强大且高效的方式来并发处理多个智能体/任务。

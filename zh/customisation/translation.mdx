@@ -1,0 +1,90 @@
+---
+title: 翻译
+---
+
+翻译文件位于 `.chainlit/translations` 目录。文件以语言代码命名，例如 `en-US.json` 表示英语（美国）。
+
+<Note>
+  语言会根据每位用户的浏览器语言动态设置。默认语言为 `en-US`。
+</Note>
+
+## 定制 UI 文本
+
+除标准翻译外，你还可以定制 UI 中使用的各前端组件文本。每个 UI 元素在翻译文件中都有唯一的翻译键。通过修改这些键，可以根据需要个性化或本地化 UI 文本。
+
+例如，要将导航标签从 "Readme" 改为 "Documentation"，在翻译文件中找到对应的键（例如 `components.organisms.header.readme`）并更新值：
+
+```json
+"components.organisms.header.readme": "Documentation"
+```
+
+## 定制聊天水印
+
+聊天输入框下方显示的免责声明文本（"LLMs can make mistakes. Check important info."）在翻译文件中由 `chat.watermark` 键定义：
+
+```json
+"chat": {
+  "watermark": "大语言模型可能出错。[查看我们的隐私政策](https://example.com/privacy)。"
+}
+```
+
+水印文本支持 Markdown，因此可以添加链接（例如指向隐私政策或使用说明）以及 `**粗体**` 和 `*斜体*` 等基本格式。
+
+<Note>
+  水印中的 Markdown 自版本 **2.9.1** 起支持。
+</Note>
+
+## 内置语言
+
+Chainlit 内置以下语言的翻译：
+
+| Code | Language |
+|------|----------|
+| `ar-SA` | Arabic (Saudi Arabia) |
+| `bn` | Bengali |
+| `da-DK` | Danish (Denmark) |
+| `de-DE` | German (Germany) |
+| `el-GR` | Greek (Greece) |
+| `en-US` | English (United States) — default |
+| `es` | Spanish |
+| `fr-FR` | French (France) |
+| `gu` | Gujarati |
+| `he-IL` | Hebrew (Israel) |
+| `hi` | Hindi |
+| `it` | Italian |
+| `ja` | Japanese |
+| `kn` | Kannada |
+| `ko` | Korean |
+| `ml` | Malayalam |
+| `mr` | Marathi |
+| `nl` | Dutch |
+| `pt-PT` | Portuguese (Portugal) |
+| `ta` | Tamil |
+| `te` | Telugu |
+| `zh-CN` | Chinese (Simplified) |
+| `zh-TW` | Chinese (Traditional) |
+
+## 添加新语言
+
+要添加新语言，在 `.chainlit/translations` 目录中创建以语言代码为文件名的文件。语言代码格式为 `languageCode-COUNTRYCODE`，例如 `en-US` 表示英语（美国）或 `en-GB` 表示英语（英国）。
+
+## 检查翻译
+
+要检查翻译，运行以下命令：
+
+```bash
+chainlit lint-translations
+```
+
+## 翻译 chainlit.md 文件
+
+你可以为 `chainlit.md` 文件定义多种翻译。例如 `chainlit_pt-BR.md` 表示葡萄牙语（巴西），`chainlit_es-ES.md` 表示西班牙语（西班牙）。
+文件将根据浏览器语言加载，若无可用翻译则默认使用 `chainlit.md`。
+
+## 重置
+
+要重置翻译，删除 `.chainlit/translations` 目录并重启 Chainlit 应用：
+
+```bash
+chainlit run my-app.py
+```

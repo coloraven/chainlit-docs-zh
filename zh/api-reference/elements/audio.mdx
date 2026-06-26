@@ -1,0 +1,50 @@
+---
+title: "Audio"
+---
+
+`Audio` 类允许你在聊天机器人用户界面中显示特定音频文件的播放器。
+
+你必须提供 `url`、`path` 或 `content` 字节内容中的至少一项。
+
+## 属性
+
+<ParamField path="name" type="str">
+  在 UI 中显示的音频文件名。此名称会展示给用户。
+</ParamField>
+
+<ParamField path="display" type="ElementDisplay" optional>
+  决定元素在 UI 中的显示位置。可选值为 "side"（默认）、"inline" 或 "page"。
+</ParamField>
+
+<ParamField path="url" type="str" optional>
+  音频的远程 URL。
+</ParamField>
+
+<ParamField path="path" type="str" optional>
+  音频的本地文件路径。
+</ParamField>
+
+<ParamField path="content" type="bytes" optional>
+  音频的文件内容（字节格式）。
+</ParamField>
+
+<ParamField path="auto_play" type="bool" optional>
+  音频是否自动开始播放。
+</ParamField>
+
+## 示例
+
+```python
+import chainlit as cl
+
+
+@cl.on_chat_start
+async def main():
+    elements = [
+        cl.Audio(name="example.mp3", path="./example.mp3", display="inline"),
+    ]
+    await cl.Message(
+        content="这是一个音频文件",
+        elements=elements,
+    ).send()
+```

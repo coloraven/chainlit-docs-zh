@@ -1,0 +1,182 @@
+---
+title: "AskElementMessage"
+---
+
+在继续执行之前请求用户完成自定义元素（填写表单）。
+这使智能体能够向用户界面发送交互式、需经用户同意的 UI 组件，让用户审阅或编辑其值，并将结果提交回后端。
+
+如果用户未在指定时间内作答（见 `timeout`），将根据 `raise_on_timeout` 参数的设置抛出 `TimeoutError` 或返回 `None`。
+如果配置了项目 ID，消息将上传到云存储。
+
+### 属性
+
+<ParamField path="content" type="str">
+  消息内容。
+</ParamField>
+<ParamField path="element" type="CustomElement">
+  向用户展示以供交互的 [CustomElement](api-reference/elements/custom)。
+</ParamField>
+<ParamField path="author" type="str" optional default="config.ui.name">
+  消息作者，默认为你在配置中定义的聊天机器人名称。
+</ParamField>
+<ParamField path="timeout" type="int" optional default={90}>
+  等待用户作答的秒数，超时后将抛出 TimeoutError。
+</ParamField>
+<ParamField path="raise_on_timeout" type="bool" optional default={false}>
+  若用户未在指定时间内作答，是否抛出 socketio TimeoutError。
+</ParamField>
+
+### 返回值
+
+<ResponseField name="response" type="AskElementResponse | None">
+  包含用户提交的元素数据的响应。
+</ResponseField>
+
+### 示例
+
+#### 后端：请求填写 Jira 工单表单
+
+```python
+import chainlit as cl
+
+
+@cl.on_chat_start
+async def on_start():
+    element = cl.CustomElement(
+        name="JiraTicket",
+        display="inline",
+        props={
+            "timeout": 20,
+            "fields": [
+                {"id": "summary", "label": "摘要", "type": "text", "required": True},
+                {"id": "description", "label": "描述", "type": "textarea"},
+                {
+                    "id": "due",
+                    "label": "截止日期",
+                    "type": "date",
+                },
+                {
+                    "id": "priority",
+                    "label": "优先级",
+                    "type": "select",
+                    "options": ["低", "中", "高"],
+                    "value": "中",
+                    "required": True,
+                },
+            ],
+        },
+    )
+    res = await cl.AskElementMessage(
+        content="创建新的 Jira 工单：", element=element, timeout=10
+    ).send()
+    if res and res.get("submitted"):
+        await cl.Message(
+            content=f"工单 '{res['summary']}'（优先级 {res['priority']}）已提交"
+        ).send()
+```
+
+#### 前端：Jira 工单自定义元素实现
+
+自定义元素应实现为处理表单提交的 React 组件。以下是 LogExpense 组件的示例：
+
+```jsx
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import React, { useEffect, useMemo, useState } from 'react';
+
+export default function JiraTicket() {
+  const [timeLeft, setTimeLeft] = useState(props.timeout || 30);
+  const [values, setValues] = useState(() => {
+    const init = {};
+    (props.fields || []).forEach((f) => {
+      init[f.id] = f.value || '';
+    });
+    return init;
+  });
+
+  const allValid = useMemo(() => {
+    if (!props.fields) return true;
+    return props.fields.every((f) => {
+      if (!f.required) return true;
+      const val = values[f.id];
+      return val !== undefined && val !== '';
+    });
+  }, [props.fields, values]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimeLeft((t) => (t > 0 ? t - 1 : 0));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleChange = (id, val) => {
+    setValues((v) => ({ ...v, [id]: val }));
+  };
+
+  const renderField = (field) => {
+    const value = values[field.id];
+    switch (field.type) {
+      case 'textarea':
+        return <Textarea id={field.id} value={value} onChange={(e) => handleChange(field.id, e.target.value)} />;
+      case 'select':
+        return (
+          <Select value={value} onValueChange={(val) => handleChange(field.id, val)}>
+            <SelectTrigger id={field.id}>
+              <SelectValue placeholder={field.label} />
+            </SelectTrigger>
+            <SelectContent>
+              {field.options.map((opt) => (
+                <SelectItem key={opt} value={opt}>
+                  {opt}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        );
+      case 'date':
+        return <Input type="date" id={field.id} value={value} onChange={(e) => handleChange(field.id, e.target.value)} />;
+      case 'datetime':
+        return <Input type="datetime-local" id={field.id} value={value} onChange={(e) => handleChange(field.id, e.target.value)} />;
+      default:
+        return <Input id={field.id} value={value} onChange={(e) => handleChange(field.id, e.target.value)} />;
+    }
+  };
+
+  return (
+    <Card id="jira-ticket" className="mt-4 w-full max-w-3xl grid grid-cols-2 gap-4">
+      <CardHeader className="col-span-2">
+        <CardTitle>创建 JIRA 工单</CardTitle>
+        <CardDescription>请填写新工单的详细信息。剩余 {timeLeft} 秒</CardDescription>
+      </CardHeader>
+      <CardContent className="col-span-2 grid grid-cols-2 gap-4">
+        {props.fields.map((field) => (
+          <div key={field.id} className="flex flex-col gap-2">
+            <Label htmlFor={field.id}>
+              {field.label}
+              {field.required && <span className="text-red-500">*</span>}
+            </Label>
+            {renderField(field)}
+          </div>
+        ))}
+      </CardContent>
+      <CardFooter className="col-span-2 flex justify-end gap-2">
+        <Button id="ticket-cancel" variant="outline" onClick={() => cancelElement()}>
+          取消
+        </Button>
+        <Button
+          id="ticket-submit"
+          disabled={!allValid}
+          onClick={() => submitElement(values)}
+        >
+          提交
+        </Button>
+      </CardFooter>
+    </Card>
+  );
+}
+```

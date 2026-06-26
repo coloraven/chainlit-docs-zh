@@ -1,0 +1,66 @@
+---
+title: "命令"
+---
+
+命令（Command）是以确定性方式捕获用户意图的绝佳方式。
+
+## 属性
+
+<ParamField path="id" type="str">
+  命令标识符，将在 UI 中使用。
+</ParamField>
+
+<ParamField path="icon" type="str" optional>
+  命令的 lucide 图标名称。参见 https://lucide.dev/icons/。
+</ParamField>
+
+<ParamField path="description" type="str" optional>
+  命令描述。
+</ParamField>
+
+<ParamField path="button" type="boolean" optional>
+  是否在消息输入框中将命令显示为按钮。
+</ParamField>
+
+<ParamField path="persistent" type="boolean" optional>
+  用户发送消息后是否保持命令处于激活状态。
+</ParamField>
+
+
+## 设置可用命令
+
+你可以随时使用 `cl.context.emitter.set_commands` 方法设置可用命令。
+
+```python
+import chainlit as cl
+
+commands = [
+    {"id": "Picture", "icon": "image", "description": "使用 DALL-E"},
+    {"id": "Search", "icon": "globe", "description": "在网络上搜索"},
+    {
+        "id": "Canvas",
+        "icon": "pen-line",
+        "description": "协作编写文本和代码",
+    },
+]
+
+@cl.on_chat_start
+async def start():
+    await cl.context.emitter.set_commands(commands)
+
+@cl.on_message
+async def message(msg: cl.Message):
+    if msg.command == "Picture":
+        # 用户正在使用 Picture 命令
+        pass
+    pass
+```
+
+<Frame caption="用户选择命令">
+  <img src="/images/command.gif" />
+</Frame>
+
+<Note>
+  自版本 **2.1.0** 起。如果你使用基于 SQL 的数据层，`steps` 表需要 `command` 列。参见[迁移指南](/guides/migration/2.1.0)。
+</Note>
+

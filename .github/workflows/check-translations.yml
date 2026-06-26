@@ -1,0 +1,69 @@
+name: Check Translations
+
+on:
+  pull_request:
+    paths:
+      - "zh/**"
+      - ".translation-lock.json"
+      - "scripts/**"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate lock consistency
+        run: python scripts/translation_status.py --validate
+
+      - name: Verify zh changes update lock
+        run: |
+          python <<'PY'
+          import json
+          import os
+          import subprocess
+          from pathlib import Path
+
+          root = Path(".")
+          lock_path = root / ".translation-lock.json"
+          lock = json.loads(lock_path.read_text(encoding="utf-8")) if lock_path.exists() else {}
+
+          result = subprocess.run(
+              ["git", "diff", "--name-only", "origin/${{ github.base_ref }}...HEAD"],
+              capture_output=True,
+              text=True,
+              check=False,
+          )
+          changed = [line.strip() for line in result.stdout.splitlines() if line.strip()]
+
+          zh_changed = [p for p in changed if p.startswith("zh/") and p.endswith(".mdx")]
+          lock_changed = ".translation-lock.json" in changed
+
+          if zh_changed and not lock_changed:
+              print("Error: zh/ MDX changed but .translation-lock.json was not updated.")
+              print("Changed zh files:")
+              for path in zh_changed:
+                  print(f"  - {path}")
+              print("Run: python scripts/translation_status.py --mark-translated <zh-path>")
+              raise SystemExit(1)
+
+          for zh_path in zh_changed:
+              source_key = "/".join(Path(zh_path).parts[1:])
+              entry = lock.get(source_key)
+              if not entry or entry.get("status") != "synced":
+                  print(f"Error: {zh_path} is not marked synced in .translation-lock.json")
+                  raise SystemExit(1)
+              if not Path(zh_path).exists():
+                  print(f"Error: missing file {zh_path}")
+                  raise SystemExit(1)
+
+          print("Translation checks passed.")
+          PY

@@ -1,0 +1,23 @@
+---
+title: "on_message"
+---
+
+用于响应来自 UI 的消息的装饰器。
+每当收到新消息时，被装饰的函数都会被调用。
+
+## 参数
+
+<ParamField path="message" type="cl.Message">
+  来自 UI 的消息。
+</ParamField>
+
+## 用法
+
+```python
+import chainlit as cl
+
+@cl.on_message
+def main(message: cl.Message):
+  content = message.content
+  # 在此处理消息
+```

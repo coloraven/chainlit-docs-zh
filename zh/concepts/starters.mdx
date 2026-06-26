@@ -1,0 +1,162 @@
+---
+title: 启动建议
+---
+
+启动建议（Starters）是帮助用户快速上手你的助手的推荐提示。
+
+```python starters.py
+import chainlit as cl
+
+@cl.set_starters
+async def set_starters():
+    return [
+        cl.Starter(
+            label="晨间习惯构思",
+            message="你能帮我制定一个个性化的晨间习惯，以提高我一天的工作效率吗？请先询问我目前的习惯，以及哪些晨间活动能让我感到精力充沛。",
+            icon="/public/idea.svg",
+        ),
+
+        cl.Starter(
+            label="解释超导体",
+            message="像给五岁小孩一样解释超导体。",
+            icon="/public/learn.svg",
+        ),
+        cl.Starter(
+            label="每日邮件报告的 Python 脚本",
+            message="用 Python 编写一个自动发送每日邮件报告的脚本，并指导我如何设置。",
+            icon="/public/terminal.svg",
+            command="code",
+        ),
+        cl.Starter(
+            label="邀请朋友参加婚礼的短信",
+            message="写一条短信，邀请朋友下个月做我的婚礼伴郎/伴娘。要非常简短随意，并给对方留有余地。",
+            icon="/public/write.svg",
+        )
+    ]
+# ...
+```
+
+<Frame caption="启动建议示例">
+  <img src="/images/starters.gif" />
+</Frame>
+
+## 启动建议分类
+
+你可以将启动建议分组为可点击按钮的分类。用户选择某个分类后会显示该分类下的启动建议。使用 `@cl.set_starter_categories` 定义分类：
+
+```python starter_categories.py
+import chainlit as cl
+
+@cl.set_starter_categories
+async def starter_categories(user: cl.User):
+    return [
+        cl.StarterCategory(
+            label="创意",
+            icon="https://example.com/creative.png",  # 可选
+            starters=[
+                cl.Starter(label="写一首诗", message="写一首关于大海的诗"),
+                cl.Starter(label="写一个故事", message="写一个短篇故事"),
+            ],
+        ),
+        cl.StarterCategory(
+            label="教育",
+            starters=[
+                cl.Starter(label="解释", message="解释量子计算"),
+            ],
+        ),
+    ]
+```
+
+`StarterCategory` 接受以下参数：
+- `label` (str) — 分类按钮文本
+- `icon` (str, optional) — 分类图标的 URL
+- `starters` (List[Starter]) — 选择该分类后显示的启动建议
+
+回调函数接受与 `@cl.set_starters` 相同的可选参数：`user`、`language` 和 `chat_profile`。这些参数均为可选——只需声明你需要的参数。
+
+```python profile_categories.py
+@cl.set_starter_categories
+async def starter_categories(user: cl.User, language: str, chat_profile: str):
+    if chat_profile == "高级":
+        return [
+            cl.StarterCategory(
+                label="高级",
+                starters=[
+                    cl.Starter(label="深入探讨", message="详细解释"),
+                ],
+            ),
+        ]
+    return [
+        cl.StarterCategory(
+            label="通用",
+            starters=[
+                cl.Starter(label="你好", message="打个招呼"),
+            ],
+        ),
+    ]
+```
+
+<Note>
+  `chat_profile` 参数自版本 **2.11.1** 起可用。
+</Note>
+
+当同时定义了 `@cl.set_starters` 和 `@cl.set_starter_categories` 时，分类优先。
+
+<Note>
+  自版本 **2.10.0** 起。
+</Note>
+
+## 本地化
+
+`@cl.set_starters` 回调接受可选的 `language` 参数，允许你根据用户语言返回本地化的启动建议。
+
+```python localized_starters.py
+@cl.set_starters
+async def set_starters(current_user: cl.User, language: str):
+    if language == "fr":
+        return [
+            cl.Starter(
+                label="Routine matinale",
+                message="Pouvez-vous m'aider à créer une routine matinale personnalisée ?",
+                icon="/public/idea.svg",
+            ),
+        ]
+    return [
+        cl.Starter(
+            label="晨间习惯构思",
+            message="你能帮我制定一个个性化的晨间习惯吗？",
+            icon="/public/idea.svg",
+        ),
+    ]
+```
+
+## 与聊天配置配合使用
+
+启动建议也可与[聊天配置（Chat Profiles）](/advanced-features/chat-profiles)配合使用。你可以为不同的聊天配置定义不同的启动建议。
+
+```python starters_with_chat_profiles.py
+@cl.set_chat_profiles
+async def chat_profile(current_user: cl.User):
+    if current_user.metadata["role"] != "ADMIN":
+        return None
+
+    return [
+        cl.ChatProfile(
+            name="我的聊天配置",
+            icon="https://picsum.photos/250",
+            markdown_description="底层 LLM 模型是 **GPT-3.5**，一个在 410GB 文本数据上训练的 *1750 亿参数模型*。",
+            starters=[
+                cl.Starter(
+                    label="晨间习惯构思",
+                    message="你能帮我制定一个个性化的晨间习惯，以提高我一天的工作效率吗？请先询问我目前的习惯，以及哪些晨间活动能让我感到精力充沛。",
+                    icon="/public/idea.svg",
+                ),
+                cl.Starter(
+                    label="解释超导体",
+                    message="像给五岁小孩一样解释超导体。",
+                    icon="/public/learn.svg",
+                ),
+            ],
+        )
+    ]
+```

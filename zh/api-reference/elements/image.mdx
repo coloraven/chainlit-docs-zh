@@ -1,0 +1,50 @@
+---
+title: "Image"
+---
+
+`Image` 类用于创建和处理图片元素，以便在聊天机器人用户界面中发送和显示。
+
+你必须提供 `url`、`path` 或 `content` 字节内容中的至少一项。
+
+## 属性
+
+<ParamField path="name" type="str">
+  在 UI 中显示的图片名称。
+</ParamField>
+
+<ParamField path="display" type="ElementDisplay" optional>
+  决定图片元素在 UI 中的显示方式。可选值为 "side"、"inline" 或 "page"。
+</ParamField>
+
+<ParamField path="size" type="ElementSize" optional>
+  决定图片大小。仅当 `display="inline"` 时生效。可选值为 "small"、"medium"（默认）或 "large"。
+</ParamField>
+
+<ParamField path="url" type="str" optional>
+  图片的远程 URL。
+</ParamField>
+
+<ParamField path="path" type="str" optional>
+  图片的本地文件路径。
+</ParamField>
+
+<ParamField path="content" type="bytes" optional>
+  图片的文件内容（字节格式）。
+</ParamField>
+
+## 示例
+
+```python
+import chainlit as cl
+
+
+@cl.on_chat_start
+async def start():
+    image = cl.Image(path="./cat.jpeg", name="image1", display="inline")
+
+    # 将图片附加到消息
+    await cl.Message(
+        content="此消息包含一张图片！",
+        elements=[image],
+    ).send()
+```

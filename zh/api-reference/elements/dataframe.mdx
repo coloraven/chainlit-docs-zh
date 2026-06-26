@@ -1,0 +1,119 @@
+---
+title: "Dataframe"
+---
+
+`Dataframe` 类用于向聊天机器人用户界面发送数据框。同时支持 `pandas` 和 `polars` DataFrame——两者均非硬依赖，你可以使用已安装的任意一种。
+
+## 属性
+
+<ParamField path="name" type="str">
+  在 UI 中显示的数据框名称。
+</ParamField>
+
+<ParamField path="display" type="ElementDisplay" optional>
+  决定数据框元素在 UI 中的显示方式。可选值为 "side"、"inline" 或 "page"。
+</ParamField>
+
+<ParamField path="data" type="Union[pd.DataFrame, pl.DataFrame]" optional>
+  pandas 或 polars DataFrame 实例。
+
+  <Note>
+    自 **2.11.0** 版本起支持 Polars。
+  </Note>
+</ParamField>
+
+## 示例
+
+```python
+import pandas as pd
+
+import chainlit as cl
+
+
+@cl.on_chat_start
+async def start():
+    # 创建一个包含超过 10 行的示例 DataFrame，用于测试分页功能
+    data = {
+        "Name": [
+            "Alice",
+            "David",
+            "Charlie",
+            "Bob",
+            "Eva",
+            "Grace",
+            "Hannah",
+            "Jack",
+            "Frank",
+            "Kara",
+            "Liam",
+            "Ivy",
+            "Mia",
+            "Noah",
+            "Olivia",
+        ],
+        "Age": [25, 40, 35, 30, 45, 55, 60, 70, 50, 75, 80, 65, 85, 90, 95],
+        "City": [
+            "New York",
+            "Houston",
+            "Chicago",
+            "Los Angeles",
+            "Phoenix",
+            "San Antonio",
+            "San Diego",
+            "San Jose",
+            "Philadelphia",
+            "Austin",
+            "Fort Worth",
+            "Dallas",
+            "Jacksonville",
+            "Columbus",
+            "Charlotte",
+        ],
+        "Salary": [
+            70000,
+            100000,
+            90000,
+            80000,
+            110000,
+            130000,
+            140000,
+            160000,
+            120000,
+            170000,
+            180000,
+            150000,
+            190000,
+            200000,
+            210000,
+        ],
+    }
+
+    df = pd.DataFrame(data)
+
+    elements = [cl.Dataframe(data=df, display="inline", name="Dataframe")]
+
+    await cl.Message(content="此消息包含一个 Dataframe", elements=elements).send()
+```
+
+### Polars
+
+```python
+import polars as pl
+
+import chainlit as cl
+
+
+@cl.on_chat_start
+async def start():
+    df = pl.DataFrame(
+        {
+            "Name": ["Alice", "Bob", "Charlie"],
+            "Age": [25, 30, 35],
+            "City": ["New York", "Los Angeles", "Chicago"],
+        }
+    )
+
+    elements = [cl.Dataframe(data=df, display="inline", name="Dataframe")]
+
+    await cl.Message(content="此消息包含一个 Dataframe", elements=elements).send()
+```

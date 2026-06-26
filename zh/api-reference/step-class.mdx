@@ -1,0 +1,153 @@
+---
+title: "Step Class"
+---
+
+`Step` 类是一个 Python 上下文管理器，可用于在 Chainlit 应用中创建步骤。进入上下文管理器时创建步骤，退出时向客户端更新步骤。
+
+## 参数
+
+<ParamField path="name" type="str" optional>
+  步骤的名称。默认为被装饰函数的名称。
+</ParamField>
+<ParamField path="type" type="Enum" default="undefined" optional>
+  步骤的类型，便于监控和调试。
+</ParamField>
+<ParamField path="elements" type="List[Element]" optional>
+  要附加到步骤的元素。
+</ParamField>
+<ParamField path="language" type="str" optional>
+  输出的语言。参见
+  https://react-code-blocks-rajinwonderland.vercel.app/?path=/story/codeblock--supported-languages
+  获取支持的语言列表。
+</ParamField>
+<ParamField path="show_input" type="Union[bool, str]" default={false} optional>
+  默认仅显示步骤的输出。设为 `True` 可同时显示输入。也可设为 `json` 或 `python` 等语言以对输入进行语法高亮。
+</ParamField>
+<ParamField path="default_open" type="bool" default={false} optional>
+  步骤是否默认在 UI 中展开显示。
+
+  <Note>
+    Since version **2.3.0**. 基于 SQL 的数据层需要在 `steps` 表中包含 `defaultOpen` 列。参见[迁移指南](/guides/migration/2.3.0)。
+  </Note>
+</ParamField>
+<ParamField path="metadata" type="Dict" optional>
+  要附加到步骤的自定义元数据字典。会随步骤持久化到数据层。
+</ParamField>
+<ParamField path="tags" type="List[str]" optional>
+  要附加到步骤的标签，用于筛选和分类。
+</ParamField>
+<ParamField path="id" type="str" optional>
+  步骤的唯一标识符。若未提供，则自动生成 UUID。
+</ParamField>
+<ParamField path="parent_id" type="str" optional>
+  父步骤的 ID。若未提供，则自动从上下文管理器嵌套层级解析。
+</ParamField>
+<ParamField path="icon" type="str" optional>
+  用于替代默认步骤头像的 Lucide 图标名称。参见 https://lucide.dev/icons 获取可用图标。
+
+  <Note>
+    Since version **2.11.0**.
+  </Note>
+</ParamField>
+<ParamField path="thread_id" type="str" optional>
+  此步骤所属会话线程的 ID。若未提供，则自动从当前会话上下文解析。
+</ParamField>
+
+## 发送步骤
+
+```python
+import chainlit as cl
+
+@cl.on_message
+async def main():
+    async with cl.Step(name="Test") as step:
+        # 进入上下文管理器后立即发送步骤
+        step.input = "hello"
+        step.output = "world"
+
+    # 退出上下文管理器时更新步骤
+```
+
+## 流式传输输出
+
+```python
+from openai import AsyncOpenAI
+
+import chainlit as cl
+
+client = AsyncOpenAI()
+
+@cl.on_message
+async def main(msg: cl.Message):
+
+    async with cl.Step(name="gpt4", type="llm") as step:
+        step.input = msg.content
+
+        stream = await client.chat.completions.create(
+            messages=[{"role": "user", "content": msg.content}],
+            stream=True,
+            model="gpt-4",
+            temperature=0,
+        )
+
+        async for part in stream:
+            delta = part.choices[0].delta
+            if delta.content:
+                # 流式传输步骤的输出
+                await step.stream_token(delta.content)
+```
+
+## 嵌套步骤
+
+要嵌套步骤，只需在另一个步骤内创建步骤。
+
+```python
+import chainlit as cl
+
+
+@cl.on_chat_start
+async def main():
+    async with cl.Step(name="Parent step") as parent_step:
+        parent_step.input = "Parent step input"
+
+        async with cl.Step(name="Child step") as child_step:
+            child_step.input = "Child step input"
+            child_step.output = "Child step output"
+
+        parent_step.output = "Parent step output"
+```
+
+## 更新步骤
+
+```python
+import chainlit as cl
+
+
+@cl.on_chat_start
+async def main():
+    async with cl.Step(name="Parent step") as step:
+        step.input = "Parent step input"
+        step.output = "Parent step output"
+
+    await cl.sleep(2)
+
+    step.output = "Parent step output updated"
+    await step.update()
+```
+
+## 移除步骤
+
+```python
+import chainlit as cl
+
+
+@cl.on_chat_start
+async def main():
+    async with cl.Step(name="Parent step") as step:
+        step.input = "Parent step input"
+        step.output = "Parent step output"
+
+    await cl.sleep(2)
+
+    await step.remove()
+```

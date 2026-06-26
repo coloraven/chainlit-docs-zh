@@ -1,0 +1,60 @@
+---
+title: 步骤
+---
+
+由 LLM 驱动的助手需要多个步骤来处理用户请求，形成思维链（Chain of Thought）。
+与[消息](concepts/message)不同，步骤（Step）具有类型、输入/输出以及开始/结束时间。
+
+根据 `config.ui.cot` 设置，完整的思维链可以全部显示、隐藏或仅显示工具调用。
+
+## 简单的工具调用示例
+
+以下是一个简单的思维链示例：接收用户消息、进行处理并发送响应。
+
+```py
+import chainlit as cl
+
+
+@cl.step(type="tool")
+async def tool():
+    # 模拟运行中的任务
+    await cl.sleep(2)
+
+    return "来自工具的响应！"
+
+
+@cl.on_message
+async def main(message: cl.Message):
+    # 调用工具
+    tool_res = await tool()
+
+    # 发送最终答案
+    await cl.Message(content="这是最终答案").send()
+```
+
+<Frame caption="上述代码的输出">
+  <img src="/images/step.png" />
+</Frame>
+
+## Step API
+
+创建步骤有两种方式：使用 `@cl.step` 装饰器，或使用 `cl.Step` 类。
+
+<CardGroup cols={2}>
+  <Card
+    title="@cl.step"
+    icon="at"
+    color="#F80061"
+    href="/api-reference/step-decorator"
+  >
+    更易使用，但需要将步骤逻辑拆分到独立函数中。
+  </Card>
+  <Card
+    title="with cl.Step():"
+    icon="code"
+    color="#F80061"
+    href="/api-reference/step-class"
+  >
+    更冗长，但可作为 Python 上下文管理器在任何场景中使用。
+  </Card>
+</CardGroup>

@@ -1,0 +1,47 @@
+---
+title: "Checkbox"
+---
+
+### 属性
+
+<ParamField path="id" type="str">
+  用于从设置中检索控件值的标识符。
+</ParamField>
+
+<ParamField path="label" type="str">
+  显示在复选框旁边的标签。
+</ParamField>
+
+<ParamField path="initial" type="bool" default={false}>
+  复选框的初始选中状态。
+</ParamField>
+
+<ParamField path="tooltip" type="str" optional>
+  悬停在标签上时显示的工具提示文本。
+</ParamField>
+
+<ParamField path="description" type="str" optional>
+  显示在输入控件下方的文本。
+</ParamField>
+
+### 用法
+
+```python Code Example
+import chainlit as cl
+from chainlit.input_widget import Checkbox
+
+
+@cl.on_chat_start
+async def start():
+    settings = await cl.ChatSettings(
+        [
+            Checkbox(
+                id="VerboseMode",
+                label="启用详细输出",
+                initial=False,
+            )
+        ]
+    ).send()
+    value = settings["VerboseMode"]
+
+```

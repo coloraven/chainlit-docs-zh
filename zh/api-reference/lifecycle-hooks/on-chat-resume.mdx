@@ -1,0 +1,42 @@
+---
+title: "on_chat_resume"
+---
+
+用于让用户继续对话的装饰器。
+需要同时启用[数据持久化](/data-persistence/overview)和[身份认证](/authentication)。
+
+此装饰器会自动：
+
+- 将持久化的消息和元素发送到 UI。
+- 恢复用户会话。
+
+<Warning>
+  用户会话中只有可 JSON 序列化的字段会被保存和恢复。
+</Warning>
+
+## 用法
+
+至少需要使用 `@cl.on_chat_resume` 装饰器才能恢复对话。
+
+```python
+@cl.on_chat_resume
+async def on_chat_resume(thread):
+    pass
+```
+
+不过，如果你使用的是 LangChain 智能体等，则需要自行重新实例化并将其设置到用户会话中。
+
+<Card
+  title="恢复 LangChain 聊天示例"
+  color="#F80061"
+  icon="message"
+  href="https://github.com/Chainlit/cookbook/tree/main/resume-chat"
+>
+  如何在保留上下文的情况下恢复聊天的实用示例。
+</Card>
+
+## 参数
+
+<ParamField path="thread" type="ThreadDict">
+  要恢复的已持久化聊天。
+</ParamField>

@@ -1,0 +1,17 @@
+---
+title: "on_audio_chunk"
+---
+
+用于响应来自用户麦克风的传入音频块的钩子。
+
+## 用法
+
+```python
+from io import BytesIO
+import chainlit as cl
+
+
+@cl.on_audio_chunk
+async def on_audio_chunk(chunk: cl.InputAudioChunk):
+    pass
+```

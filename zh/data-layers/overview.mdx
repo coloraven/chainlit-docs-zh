@@ -1,0 +1,79 @@
+---
+title: 概览
+---
+
+为开源数据层选择以下选项之一：
+- 使用官方 Chainlit 数据层（PostgreSQL + asyncpg）
+- 利用社区数据层
+- 或自行构建！
+
+<CardGroup cols={2}>
+    <Card
+        title="官方数据层"
+        icon="check"
+        color="#16a34a"
+        href="/data-layers/official"
+    >
+        官方 Chainlit 数据层
+    </Card>
+    <Card
+        title="社区 SQLAlchemy 数据层"
+        icon="database"
+        color="#0285c7"
+        href="/data-layers/sqlalchemy"
+    >
+        社区 SQLAlchemy 数据层
+    </Card>
+    <Card
+        title="社区 DynamoDB 数据层"
+        icon="database"
+        color="#3afadc"
+        href="/data-layers/dynamodb"
+    >
+        社区 DynamoDB 数据层
+    </Card>
+    <Card
+        title="自定义数据层 API"
+        icon="text"
+        color="#ea5a0c"
+        href="/api-reference/data-persistence/custom-data-layer"
+    >
+        自定义数据层实现参考
+    </Card>
+</CardGroup>
+
+
+## 官方数据层
+
+使用[官方数据层](/data-layers/official)时，只需在 `.env` 中添加 `DATABASE_URL` 变量，
+并在需要时配置云存储。
+
+## 社区数据层
+
+对于社区数据层，需要在 chainlit 应用中导入相应的数据层。
+以下是如何使用 `SQLAlchemyDataLayer` 的示例：
+
+```python
+import chainlit as cl
+
+from chainlit.data.sql_alchemy import SQLAlchemyDataLayer
+
+@cl.data_layer
+def get_data_layer():
+    return SQLAlchemyDataLayer(conninfo="...")
+```
+
+## 自定义数据层
+
+请遵循[参考文档](/api-reference/data-persistence/custom-data-layer)，了解自定义数据层需要实现的方法完整列表。
+
+## 开箱即用的云存储提供方
+
+- AWS S3
+  - 通过 `DEV_AWS_ENDPOINT` 环境变量使用 LocalStack
+- Azure
+  - Blob Storage
+  - Data Lake Storage (ADLS) Gen2
+- Google Cloud Storage
+  - 通过私钥
+  - 通过 Application Default Credentials（例如在 Google Cloud Run 中）

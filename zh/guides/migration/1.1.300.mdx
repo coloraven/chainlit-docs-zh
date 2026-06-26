@@ -1,0 +1,176 @@
+---
+title: 迁移到 Chainlit v1.1.300
+---
+
+<Note>加入 Discord 获取实时更新：https://discord.gg/AzyvDHWARx</Note>
+
+## 更新 Chainlit
+
+通过将 Chainlit 更新到最新版本开始迁移：
+
+```bash
+pip install --upgrade chainlit
+```
+
+## 新功能：启动建议
+
+<Frame caption="启动建议示例">
+  <img src="/images/starters.gif" />
+</Frame>
+
+此版本引入了新功能「启动建议」。启动建议是帮助用户开始使用助手的建议。
+你可以声明最多 4 个启动建议，并可选地为每个定义图标。
+
+```python starters.py
+import chainlit as cl
+
+@cl.set_starters
+async def set_starters():
+    return [
+        cl.Starter(
+            label="晨间 routine 创意",
+            message="Can you help me create a personalized morning routine that would help increase my productivity throughout the day? Start by asking me about my current habits and what activities energize me in the morning.",
+            icon="/public/idea.svg",
+            ),
+
+        cl.Starter(
+            label="解释超导体",
+            message="Explain superconductors like I'm five years old.",
+            icon="/public/learn.svg",
+            ),
+        cl.Starter(
+            label="每日邮件报告 Python 脚本",
+            message="Write a script to automate sending daily email reports in Python, and walk me through how I would set it up.",
+            icon="/public/terminal.svg",
+            ),
+        cl.Starter(
+            label="邀请朋友参加婚礼的短信",
+            message="Write a text asking a friend to be my plus-one at a wedding next month. I want to keep it super short and casual, and offer an out.",
+            icon="/public/write.svg",
+            )
+        ]
+# ...
+```
+
+启动建议也适用于聊天配置。你可以为不同聊天配置定义不同的启动建议。
+
+```python starters_with_chat_profiles.py
+@cl.set_chat_profiles
+async def chat_profile(current_user: cl.User):
+    if current_user.metadata["role"] != "ADMIN":
+        return None
+
+    return [
+        cl.ChatProfile(
+            name="My Chat Profile",
+            icon="https://picsum.photos/250",
+            markdown_description="The underlying LLM model is **GPT-3.5**, a *175B parameter model* trained on 410GB of text data.",
+            starters=[
+                cl.Starter(
+                    label="晨间 routine 创意",
+                    message="Can you help me create a personalized morning routine that would help increase my productivity throughout the day? Start by asking me about my current habits and what activities energize me in the morning.",
+                    icon="/public/idea.svg",
+                ),
+                cl.Starter(
+                    label="解释超导体",
+                    message="Explain superconductors like I'm five years old.",
+                    icon="/public/learn.svg",
+                ),
+            ],
+        )
+    ]
+```
+
+## 重构：调试
+
+我们创建 Chainlit 的愿景是让调试尽可能简单。因此 Chainlit 支持复杂的思维链，甚至拥有自己的提示词 Playground。
+这很好，但将两个不同概念混在一处：
+
+1. 以最佳用户体验构建对话式 AI。
+2. 高效调试和迭代。
+
+分离这两个概念是正确的做法，以便：
+
+1. 提供更佳的用户体验（参见新的[思维链](#思维链重构)）。
+2. 提供更佳的调试体验。
+
+你可以通过在 `chainlit run` 命令中添加 `-d` 来启用新的调试模式。若数据层支持，你会在每条消息下方看到调试按钮，可跳转到 trace/提示词 Playground。
+
+<Frame caption="调试示例">
+  <img src="/images/debug.gif" />
+</Frame>
+
+这也意味着我们放弃了 Chainlit 中的提示词 Playground，并为用户欢迎简化的思维链！
+
+## 重构：思维链
+
+思维链已重构为仅一层深度，且仅包含工具；最终用户只关心 LLM 用于生成响应的工具。
+
+```python new_cot.py
+import chainlit as cl
+
+@cl.step(type="tool")
+async def tool():
+    # 模拟工具
+    await cl.sleep(2)
+    return "Tool Response"
+
+@cl.on_message
+async def on_message():
+    msg = await cl.Message("").send()
+    msg.content = await tool()
+    await msg.update()
+```
+
+<Warning>
+  请注意 [cl.Step](/concepts/step) 的 `root` 属性已
+  移除。使用 [cl.Message](/concepts/message) 发送根级消息。
+</Warning>
+
+<Frame caption="新思维链">
+  <video controls autoPlay loop src="/images/cot.mp4" />
+</Frame>
+
+数据层仍能为调试目的提供完整的思维链。
+
+## 重构：头像
+
+之前的 `cl.Avatar` 元素给开发者增加了开销，迫使他们为每个会话重新发送头像。
+它也无法与恢复的对话配合使用。
+
+`cl.Avatar` 已完全移除。现在，应将头像文件放在 `/public/avatars` 中。
+假设消息作者为 `My Assistant`，则应将头像放在 `/public/avatars/my-assistant.png`。
+
+若未找到头像，将默认使用 favicon。
+
+## 重构：自定义端点
+
+Chainlit 现在可作为 FastAPI 子应用挂载。这允许你在现有 FastAPI 应用中使用 Chainlit。
+
+更多信息请参阅 [FastAPI 集成](/integrations/fastapi) 和 [API 文档](/integrations/fastapi)。
+
+## 次要变更
+
+1. 现在可以在 `config.toml` 文件中配置默认主题。
+
+```toml config.toml
+[UI]
+  [UI.theme]
+      default = "dark"
+```
+
+2. `running`、`took_one` 和 `took_other` 翻译已替换为 `used`。
+   在翻译文件中手动替换，或删除翻译文件以重新生成。
+
+3. `show_readme_as_default` 配置已移除，由启动建议取代。
+
+4. 根级消息不再折叠。
+
+## 总结
+
+<Note>
+  完整变更日志见
+  [此处](https://github.com/Chainlit/chainlit/blob/main/CHANGELOG.md#11300rc0---2024-05-27)。
+</Note>
+
+此预发布版本为 Chainlit 带来了大量变更。尚未完全稳定，但我们期待你的反馈并进一步改进！

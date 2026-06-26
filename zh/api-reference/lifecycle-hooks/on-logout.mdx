@@ -1,0 +1,27 @@
+---
+title: "on_logout"
+---
+
+用于响应用户登出的装饰器。可用于通过 HTTP 响应清除 Cookie 或其他用户数据。
+
+## 参数
+
+<ParamField path="request" type="fastapi.Request">
+  请求对象。
+</ParamField>
+
+<ParamField path="response" type="fastapi.Response">
+  响应对象。
+</ParamField>
+## 用法
+
+```python
+from fastapi import Request, Response
+
+import chainlit as cl
+
+
+@cl.on_logout
+def main(request: Request, response: Response):
+    response.delete_cookie("my_cookie")
+```

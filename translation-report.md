@@ -1,0 +1,137 @@
+# Translation Status Report
+
+## Missing (112)
+
+- advanced-features/ask-user.mdx
+- advanced-features/chat-profiles.mdx
+- advanced-features/chat-settings.mdx
+- advanced-features/mcp.mdx
+- advanced-features/multi-modal.mdx
+- advanced-features/streaming.mdx
+- advanced-features/test-debug.mdx
+- api-reference/action.mdx
+- api-reference/ask/ask-for-action.mdx
+- api-reference/ask/ask-for-element.mdx
+- api-reference/ask/ask-for-file.mdx
+- api-reference/ask/ask-for-input.mdx
+- api-reference/author-rename.mdx
+- api-reference/cache.mdx
+- api-reference/chat-profiles.mdx
+- api-reference/chat-settings.mdx
+- api-reference/data-persistence/custom-data-layer.mdx
+- api-reference/elements/audio.mdx
+- api-reference/elements/custom.mdx
+- api-reference/elements/dataframe.mdx
+- api-reference/elements/file.mdx
+- api-reference/elements/image.mdx
+- api-reference/elements/pdf.mdx
+- api-reference/elements/plotly.mdx
+- api-reference/elements/pyplot.mdx
+- api-reference/elements/tasklist.mdx
+- api-reference/elements/text.mdx
+- api-reference/elements/video.mdx
+- api-reference/input-widgets/checkbox.mdx
+- api-reference/input-widgets/datepicker.mdx
+- api-reference/input-widgets/multiselect.mdx
+- api-reference/input-widgets/radiogroup.mdx
+- api-reference/input-widgets/select.mdx
+- api-reference/input-widgets/slider.mdx
+- api-reference/input-widgets/switch.mdx
+- api-reference/input-widgets/tags.mdx
+- api-reference/input-widgets/textinput.mdx
+- api-reference/integrations/langchain.mdx
+- api-reference/integrations/llamaindex.mdx
+- api-reference/lifecycle-hooks/on-audio-chunk.mdx
+- api-reference/lifecycle-hooks/on-audio-end.mdx
+- api-reference/lifecycle-hooks/on-chat-end.mdx
+- api-reference/lifecycle-hooks/on-chat-resume.mdx
+- api-reference/lifecycle-hooks/on-chat-start.mdx
+- api-reference/lifecycle-hooks/on-logout.mdx
+- api-reference/lifecycle-hooks/on-message.mdx
+- api-reference/lifecycle-hooks/on-shared-thread-view.mdx
+- api-reference/make-async.mdx
+- api-reference/message.mdx
+- api-reference/step-class.mdx
+- api-reference/step-decorator.mdx
+- api-reference/window-message.mdx
+- authentication/header.mdx
+- authentication/oauth.mdx
+- authentication/overview.mdx
+- authentication/password.mdx
+- backend/command-line.mdx
+- backend/config/features.mdx
+- backend/config/overview.mdx
+- backend/config/project.mdx
+- backend/config/ui.mdx
+- backend/env-variables.mdx
+- customisation/avatars.mdx
+- customisation/custom-css.mdx
+- customisation/custom-js.mdx
+- customisation/custom-logo-and-favicon.mdx
+- customisation/overview.mdx
+- customisation/theme.mdx
+- customisation/translation.mdx
+- data-layers/dynamodb.mdx
+- data-layers/official.mdx
+- data-layers/overview.mdx
+- data-layers/sqlalchemy.mdx
+- data-persistence/feedback.mdx
+- data-persistence/history.mdx
+- data-persistence/overview.mdx
+- data-persistence/tags-metadata.mdx
+- deploy/copilot.mdx
+- deploy/discord.mdx
+- deploy/overview.mdx
+- deploy/react/additional-resources.mdx
+- deploy/react/installation-and-setup.mdx
+- deploy/react/overview.mdx
+- deploy/react/usage.mdx
+- deploy/slack.mdx
+- deploy/teams.mdx
+- deploy/webapp.mdx
+- examples/community.mdx
+- examples/cookbook.mdx
+- examples/openai-sql.mdx
+- examples/qa.mdx
+- examples/security.mdx
+- guides/iframe.mdx
+- guides/migration/1.0.500.mdx
+- guides/migration/1.1.0.mdx
+- guides/migration/1.1.300.mdx
+- guides/migration/1.1.400.mdx
+- guides/migration/1.1.404.mdx
+- guides/migration/2.0.0.mdx
+- guides/migration/2.1.0.mdx
+- guides/migration/2.3.0.mdx
+- guides/migration/2.9.4.mdx
+- guides/sync-async.mdx
+- integrations/embedchain.mdx
+- integrations/fastapi.mdx
+- integrations/langchain.mdx
+- integrations/litellm.mdx
+- integrations/llama-index.mdx
+- integrations/message-based.mdx
+- integrations/mistralai.mdx
+- integrations/openai.mdx
+- integrations/semantic-kernel.mdx
+
+## Outdated (0)
+
+_None_
+
+## Synced (12)
+
+- concepts/action.mdx
+- concepts/chat-lifecycle.mdx
+- concepts/command.mdx
+- concepts/element.mdx
+- concepts/message.mdx
+- concepts/modes.mdx
+- concepts/starters.mdx
+- concepts/step.mdx
+- concepts/user-session.mdx
+- get-started/installation.mdx
+- get-started/overview.mdx
+- get-started/pure-python.mdx
+
+**Pages needing translation: 112**

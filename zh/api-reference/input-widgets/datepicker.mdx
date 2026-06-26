@@ -1,0 +1,93 @@
+---
+title: "DatePicker"
+---
+
+### 属性
+
+<ParamField path="id" type="str">
+  用于从设置中检索控件值的标识符。
+</ParamField>
+
+<ParamField path="label" type="str">
+  输入控件的标签。
+</ParamField>
+
+<ParamField path="mode" type="Literal['single', 'range']" default="'single'">
+  选择模式。`"single"` 选择单个日期，`"range"` 选择开始和结束日期。
+</ParamField>
+
+<ParamField path="initial" type="str | date | tuple[str | date, str | date] | None" optional>
+  初始值。在 `"single"` 模式下，传入 ISO 日期字符串或 `date` 对象。
+  在 `"range"` 模式下，传入包含两个值的元组（开始、结束）。
+</ParamField>
+
+<ParamField path="min_date" type="str | date | None" optional>
+  最小可选日期。此日期之前的日期在日历中会被禁用。
+</ParamField>
+
+<ParamField path="max_date" type="str | date | None" optional>
+  最大可选日期。此日期之后的日期在日历中会被禁用。
+</ParamField>
+
+<ParamField path="format" type="str | None" optional>
+  使用 [date-fns 格式标记](https://date-fns.org/docs/format) 的显示格式字符串（例如 `"yyyy/MM/dd"`）。
+</ParamField>
+
+<ParamField path="placeholder" type="str | None" optional>
+  未选择日期时显示的占位符文本。
+</ParamField>
+
+<ParamField path="tooltip" type="str" optional>
+  悬停在标签旁工具提示图标上时显示的工具提示文本。
+</ParamField>
+
+<ParamField path="description" type="str" optional>
+  显示在输入控件下方的文本。
+</ParamField>
+
+<Note>
+  Since version **2.9.6**.
+</Note>
+
+### 用法
+
+```python Single date
+import chainlit as cl
+from chainlit.input_widget import DatePicker
+
+
+@cl.on_chat_start
+async def start():
+    settings = await cl.ChatSettings(
+        [
+            DatePicker(
+                id="start_date",
+                label="开始日期",
+                placeholder="选择日期",
+                min_date="2025-01-01",
+                max_date="2026-12-31",
+            )
+        ]
+    ).send()
+    value = settings["start_date"]
+```
+
+```python Date range
+import chainlit as cl
+from chainlit.input_widget import DatePicker
+
+
+@cl.on_chat_start
+async def start():
+    settings = await cl.ChatSettings(
+        [
+            DatePicker(
+                id="date_range",
+                label="日期范围",
+                mode="range",
+                initial=("2025-06-01", "2025-06-30"),
+            )
+        ]
+    ).send()
+    value = settings["date_range"]
+```

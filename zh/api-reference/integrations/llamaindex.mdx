@@ -1,0 +1,20 @@
+---
+title: "LlamaIndex 回调处理器"
+---
+
+回调处理器，用于让 Chainlit 在 UI 中显示中间步骤。
+
+### 用法
+
+```python Code Example
+from llama_index.core.callbacks import CallbackManager
+from llama_index.core.service_context import ServiceContext
+import chainlit as cl
+
+
+
+@cl.on_chat_start
+async def start():
+    service_context = ServiceContext.from_defaults(callback_manager=CallbackManager([cl.LlamaIndexCallbackHandler()]))
+    # 使用 service context 创建 predictor
+```

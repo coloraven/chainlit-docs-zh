@@ -1,0 +1,54 @@
+---
+title: "Text"
+---
+
+`Text` 类允许你在聊天机器人用户界面中显示文本元素。该类接收一个字符串并创建可发送到 UI 的文本元素。
+它支持 Markdown 语法来格式化文本。
+
+你必须提供 `url`、`path` 或 `content` 字节中的至少一项。
+
+## 属性
+
+<ParamField path="name" type="str">
+  要在 UI 中显示的文本元素名称。
+</ParamField>
+
+<ParamField path="content" type="Union[str, bytes]" optional>
+  应作为文本元素内容显示的文本字符串或字节。
+</ParamField>
+
+<ParamField path="url" type="str" optional>
+  文本源的远程 URL。
+</ParamField>
+
+<ParamField path="path" type="str" optional>
+  文本文件的本地文件路径。
+</ParamField>
+
+<ParamField path="display" type="ElementDisplay" optional>
+  决定文本元素在 UI 中的显示方式。可选值为 "side"、"inline" 或 "page"。
+</ParamField>
+
+<ParamField path="language" type="str" optional>
+  若文本为代码片段，则指定代码语言。支持的语言列表参见
+  https://react-code-blocks-rajinwonderland.vercel.app/?path=/story/codeblock--supported-languages
+</ParamField>
+
+## 示例
+
+```python
+import chainlit as cl
+
+
+@cl.on_chat_start
+async def start():
+    text_content = "你好，这是一个文本元素。"
+    elements = [
+        cl.Text(name="simple_text", content=text_content, display="inline")
+    ]
+
+    await cl.Message(
+        content="看看这个文本元素！",
+        elements=elements,
+    ).send()
+```

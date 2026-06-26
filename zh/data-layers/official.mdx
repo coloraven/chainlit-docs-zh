@@ -1,0 +1,27 @@
+---
+title: 官方数据层
+---
+
+按照此仓库中的步骤，在 2 分钟内持久化你的对话：
+<Card
+  title="官方数据层"
+  color="#F80061"
+  icon="message"
+  href="https://github.com/Chainlit/chainlit-datalayer"
+>
+  开箱即用的数据层 schema，用于存储会话线程、步骤、反馈等。
+</Card>
+
+<Warning>
+别忘了通过在 `.env` 中添加 `DATABASE_URL` 环境变量，让 Chainlit 应用指向你设置的数据库。
+
+若要存储元素，文件系统配置同样需要配置。
+</Warning>
+
+<Warning>
+  官方数据层的 Prisma schema 自 Chainlit 2.0.0 起未更新。若使用 Chainlit 2.1.0 或更高版本，需要手动向 `"Step"` 表添加缺失的列。请参阅 [2.1.0](/guides/migration/2.1.0)、[2.3.0](/guides/migration/2.3.0) 和 [2.9.4](/guides/migration/2.9.4) 的迁移指南。
+</Warning>
+
+<Tip>
+自定义元素的 `props` 直接存储在 PostgreSQL 中，而非云存储。
+</Tip>

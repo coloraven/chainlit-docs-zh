@@ -1,0 +1,54 @@
+---
+title: vLLM、LMStudio、HuggingFace
+---
+
+我们可以利用 OpenAI instrumentation 来记录使用基于[消息](/concepts/message) API 的推理服务器（如 vLLM、LMStudio 或 HuggingFace TGI）的调用。
+
+<Warning>
+  如果你已经在使用 LangChain 或 LlamaIndex 等其他集成，则不应配置此集成。两个集成都会记录同一次生成，并在 UI 中创建重复的[步骤](/concepts/step)。
+</Warning>
+
+在项目目录中创建一个名为 `app.py` 的新 Python 文件。该文件将包含 LLM 应用的主要逻辑。
+
+在 `app.py` 中，导入必要的包，并定义一个处理来自 UI 的[消息](/concepts/message)的函数。
+
+```python
+from openai import AsyncOpenAI
+import chainlit as cl
+client = AsyncOpenAI(base_url="http://localhost:1234/v1", api_key="lm-studio")
+# 为 OpenAI 客户端启用检测
+cl.instrument_openai()
+
+settings = {
+    "model": "gpt-3.5-turbo",
+    "temperature": 0,
+    # ... 更多设置
+}
+
+@cl.on_message
+async def on_message(message: cl.Message):
+    response = await client.chat.completions.create(
+        messages=[
+            {
+                "content": "你是一个乐于助人的机器人，你总是用西班牙语回复",
+                "role": "system"
+            },
+            {
+                "content": message.content,
+                "role": "user"
+            }
+        ],
+        **settings
+    )
+    await cl.Message(content=response.choices[0].message.content).send()
+```
+
+在与 `app.py` 相同的文件夹中创建一个名为 `.env` 的文件。在 `OPENAI_API_KEY` 变量中添加你的 OpenAI API 密钥。
+
+要启动应用，请打开终端并导航到包含 `app.py` 的目录。然后运行以下命令：
+
+```bash
+chainlit run app.py -w
+```
+
+`-w` 标志会启用 Chainlit 的自动重载，因此你无需在每次修改应用后重启服务器。你的聊天机器人 UI 现在应可通过 http://localhost:8000 访问。
